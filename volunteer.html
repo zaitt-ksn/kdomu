@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — календарь волонтёров</title>
+    <meta
+      name="description"
+      content="Слоты помощи приютам: выгул, уборка, перевозка. Запишитесь в один клик."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="./index.html">К дому</a>
+      <nav class="nav">
+        <a href="./index.html#animals">Животные</a>
+        <a href="./index.html#shelters">Приюты</a>
+        <a href="./volunteer.html">Календарь</a>
+      </nav>
+      <a class="btn btn-small" href="./admin-slots.html">Слоты</a>
+    </header>
+
+    <main class="section volunteer-page">
+      <div class="section-head">
+        <h2>Календарь помощи</h2>
+        <p>
+          Выберите слот и нажмите «Записаться». Заявка уйдёт Ксении в Telegram —
+          с приютами слоты потом уточним.
+        </p>
+        <p class="tiny muted">Сейчас демо-расписание на 14 дней вперёд.</p>
+      </div>
+
+      <div class="filters slot-filters" role="group" aria-label="Фильтры слотов">
+        <label class="filter">
+          <span>Приют</span>
+          <select id="filter-shelter">
+            <option value="all">Все</option>
+          </select>
+        </label>
+        <label class="filter">
+          <span>Чем помочь</span>
+          <select id="filter-type">
+            <option value="all">Всё</option>
+          </select>
+        </label>
+        <label class="filter">
+          <span>Когда</span>
+          <select id="filter-when">
+            <option value="all">Любой день</option>
+            <option value="today">Сегодня</option>
+            <option value="weekend">Выходные</option>
+          </select>
+        </label>
+        <p class="results-count" id="slots-count"></p>
+      </div>
+
+      <div class="slot-list" id="slot-list"></div>
+    </main>
+
+    <dialog class="modal" id="signup-modal" aria-labelledby="signup-title">
+      <form method="dialog" class="modal-card" id="signup-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+        <h2 id="signup-title">Запись на слот</h2>
+        <p class="modal-lead" id="signup-lead"></p>
+        <label>Имя <input name="name" required autocomplete="name" /></label>
+        <label
+          >Telegram или телефон
+          <input name="contact" required placeholder="@username или +7…" />
+        </label>
+        <label
+          >Комментарий
+          <textarea name="comment" rows="2" placeholder="Есть машина / первый раз / …"></textarea>
+        </label>
+        <input type="hidden" name="slotId" id="signup-slot-id" />
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">Отмена</button>
+          <button class="btn" value="default" type="submit">Записаться</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="data.js"></script>
+    <script src="shared.js"></script>
+    <script src="slots-data.js"></script>
+    <script src="volunteer.js"></script>
+  </body>
+</html>

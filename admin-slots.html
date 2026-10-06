@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — админка слотов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,650;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin {
+        width: min(960px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+      }
+      .admin h1 {
+        font-family: var(--font-display);
+        margin: 0 0 0.4rem;
+      }
+      .admin-lead {
+        color: var(--ink-soft);
+        margin: 0 0 1.25rem;
+      }
+      .admin-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+      }
+      .admin-form {
+        display: grid;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        margin-bottom: 1rem;
+      }
+      .admin-form .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .admin-form label {
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+      }
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.7rem 0.85rem;
+        background: #fff;
+        font: inherit;
+      }
+      .slot-admin-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75rem;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 0.9rem 1rem;
+        margin-bottom: 0.65rem;
+      }
+      @media (max-width: 700px) {
+        .admin-form .row2,
+        .slot-admin-item {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="./index.html">К дому</a>
+      <nav class="nav">
+        <a href="./volunteer.html">Календарь</a>
+        <a href="./admin.html">Карточки</a>
+        <a href="./crm/">CRM</a>
+      </nav>
+      <a class="btn btn-small" href="./volunteer.html">К календарю</a>
+    </header>
+
+    <main class="admin">
+      <h1>Слоты волонтёров</h1>
+      <p class="admin-lead">
+        Добавляйте слоты сами. Пока хранятся в браузере. С приютами позже
+        сделаем общий доступ.
+      </p>
+
+      <div class="admin-toolbar">
+        <button class="btn" type="button" id="reset-demo">Загрузить демо на 14 дней</button>
+        <button class="btn btn-ghost" type="button" id="export-json">Скачать JSON</button>
+        <a class="btn btn-ghost" href="./volunteer.html">Открыть календарь</a>
+      </div>
+
+      <form class="admin-form" id="slot-form">
+        <div class="row2">
+          <label>Дата <input id="f-date" type="date" required /></label>
+          <label>Время <input id="f-time" type="time" value="12:00" required /></label>
+        </div>
+        <div class="row2">
+          <label
+            >Приют
+            <select id="f-shelter" required></select>
+          </label>
+          <label
+            >Тип
+            <select id="f-type" required></select>
+          </label>
+        </div>
+        <div class="row2">
+          <label>Мест <input id="f-seats" type="number" min="1" value="3" required /></label>
+          <label>Уже занято <input id="f-taken" type="number" min="0" value="0" /></label>
+        </div>
+        <label>Заметка <input id="f-note" placeholder="Что взять с собой" /></label>
+        <button class="btn" type="submit">Добавить слот</button>
+      </form>
+
+      <div id="list"></div>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="shared.js"></script>
+    <script src="slots-data.js"></script>
+    <script>
+      const Slots = window.KdomuSlots;
+      let slots = Slots.load();
+      const list = document.getElementById("list");
+      const shelterSelect = document.getElementById("f-shelter");
+      const typeSelect = document.getElementById("f-type");
+
+      (window.KDOMU_SHELTERS || []).forEach((s) => {
+        const o = document.createElement("option");
+        o.value = s.id;
+        o.textContent = s.name;
+        shelterSelect.appendChild(o);
+      });
+      (window.KDOMU_SLOT_TYPES || []).forEach((t) => {
+        const o = document.createElement("option");
+        o.value = t.id;
+        o.textContent = t.label;
+        typeSelect.appendChild(o);
+      });
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById("f-date").value = today;
+
+      function persist() {
+        Slots.save(slots);
+        render();
+      }
+
+      function render() {
+        const sorted = [...slots].sort((a, b) =>
+          a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
+        );
+        list.innerHTML = sorted
+          .map(
+            (s) => `
+          <article class="slot-admin-item">
+            <div>
+              <strong>${Slots.formatDate(s.date)}, ${s.time}</strong>
+              <div class="tiny muted">${Slots.typeLabel(s.type)} · ${s.shelterName} · мест ${Slots.freeSeats(s)}/${s.seats}</div>
+              <div class="tiny muted">${s.note || ""}</div>
+            </div>
+            <button class="btn btn-small btn-ghost" type="button" data-del="${s.id}">Удалить</button>
+          </article>`
+          )
+          .join("");
+      }
+
+      document.getElementById("slot-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const shelter = (window.KDOMU_SHELTERS || []).find(
+          (s) => s.id === shelterSelect.value
+        );
+        const time = document.getElementById("f-time").value;
+        slots.unshift({
+          id: "slot_" + Math.random().toString(36).slice(2, 9),
+          date: document.getElementById("f-date").value,
+          time: time.slice(0, 5),
+          type: typeSelect.value,
+          shelterId: shelter.id,
+          shelterName: shelter.name,
+          city: shelter.city,
+          seats: Number(document.getElementById("f-seats").value) || 1,
+          taken: Number(document.getElementById("f-taken").value) || 0,
+          note: document.getElementById("f-note").value.trim(),
+          demo: false,
+        });
+        persist();
+        e.target.reset();
+        document.getElementById("f-date").value = today;
+        document.getElementById("f-time").value = "12:00";
+        document.getElementById("f-seats").value = "3";
+        document.getElementById("f-taken").value = "0";
+      });
+
+      list.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-del]");
+        if (!btn) return;
+        slots = slots.filter((s) => s.id !== btn.dataset.del);
+        persist();
+      });
+
+      document.getElementById("reset-demo").onclick = () => {
+        if (!confirm("Заменить все слоты демо на 14 дней?")) return;
+        slots = Slots.resetDemo();
+        render();
+      };
+
+      document.getElementById("export-json").onclick = () => {
+        const blob = new Blob([JSON.stringify(slots, null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "kdomu-slots.json";
+        a.click();
+      };
+
+      render();
+    </script>
+  </body>
+</html>

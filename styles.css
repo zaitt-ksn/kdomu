@@ -814,3 +814,74 @@ textarea {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+.slot-filters {
+  margin-bottom: 1.25rem;
+}
+
+.slot-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.slot-day {
+  margin: 1.25rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--leaf-deep);
+}
+
+.slot-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.slot-card.is-full {
+  opacity: 0.72;
+}
+
+.slot-main {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  min-width: min(100%, 280px);
+}
+
+.slot-time {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--leaf-deep);
+  min-width: 4.5rem;
+}
+
+.slot-main h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.slot-main p {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.slot-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.slot-side .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
