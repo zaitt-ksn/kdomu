@@ -2,12 +2,12 @@
 
 Обновлено: 6 октября 2026  
 Основатель: Ксения · Telegram @zaitt_ksn · +7 953 293-59-63  
-Пилот сейчас: **Москва** (ЕКБ — только онлайн / на паузе, без личных визитов)
+Пилот сейчас: **Москва + Брянск**, только онлайн (визитов в ближайший месяц нет)
 
 **Сайт онлайн:** https://zaitt-ksn.github.io/kdomu/  
-**Репозиторий:** https://github.com/zaitt-ksn/kdomu  
-**CRM:** локально `crm/open.command` или https://zaitt-ksn.github.io/kdomu/crm/  
-**Админка карточек:** https://zaitt-ksn.github.io/kdomu/admin.html  
+**Для приютов:** https://zaitt-ksn.github.io/kdomu/for-shelters.html  
+**Контакты для писем:** `CONTACTS-MSK-BRYANSK.md`  
+**CRM:** https://zaitt-ksn.github.io/kdomu/crm/ → Настройки → **Сбросить к базе** (подтянет Брянск)  
 
 ---
 
@@ -77,7 +77,8 @@
 
 ## C. Фокус прямо сейчас
 
-Деньги: https://zaitt-ksn.github.io/kdomu/help-money.html  
-Приютам: https://zaitt-ksn.github.io/kdomu/for-shelters.html  
+Список: `CONTACTS-MSK-BRYANSK.md`  
+Письма: `letter.txt` (блок «удалённо»)  
+CRM: сбросить базу → очередь из приоритета A (Москва + Брянск)
 
-Дальше по смыслу — **первый живой приют**.
+На этой неделе написать **8 контактам** из файла. Цель: **1 ответ + 10 анкет онлайн**.

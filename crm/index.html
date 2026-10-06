@@ -258,7 +258,7 @@
 
   <script src="./seed.js"></script>
   <script>
-    const STORAGE_KEY = "kdomu-outreach-crm-v1";
+    const STORAGE_KEY = "kdomu-outreach-crm-v2-bryansk";
     const STATUS_LABELS = {
       cold: "cold · ещё не писали",
       touched: "touched · уже писали",
@@ -321,15 +321,14 @@
     }
 
     function defaultTasksFromContacts(contacts) {
-      const focus = "Москва";
       return contacts
-        .filter((c) => c.city === focus && c.status !== "paused" && c.status !== "lost")
+        .filter((c) => c.priority === "A" && c.status !== "paused" && c.status !== "lost")
         .map((c, i) => ({
           id: uid("task"),
           contactId: c.id,
           type: c.status === "cold" ? "msg_first" : "msg_fu",
-          title: c.status === "cold" ? "Сообщение · первое / визит" : "Follow-up",
-          due: addDays(todayISO(), i === 0 ? 0 : Math.min(i, 3)),
+          title: c.status === "cold" ? "Сообщение · онлайн-подключение" : "Follow-up",
+          due: addDays(todayISO(), i === 0 ? 0 : Math.min(i, 4)),
           status: "open",
           templateId: c.status === "cold" ? "visit" : "followup",
           note: c.note || "",
@@ -375,7 +374,7 @@
       return openTasks()
         .map((t) => ({ t, c: contactById(t.contactId) }))
         .filter((x) => x.c && x.c.status !== "paused" && x.c.status !== "lost")
-        .filter((x) => x.c.city === "Москва" || x.c.priority === "A")
+        .filter((x) => x.c.priority === "A" || x.c.city === "Москва" || x.c.city === "Брянск")
         .sort((a, b) => {
           const ad = a.t.due || "9999";
           const bd = b.t.due || "9999";
@@ -532,7 +531,7 @@
       const replied = state.contacts.filter((c) => ["replied", "meeting", "cards"].includes(c.status)).length;
       const cards = state.contacts.reduce((n, c) => n + (Number(c.cardsCount) || 0), 0);
       return `
-        <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 1 визит / 5–10 карточек</strong>. Сейчас фокус — Москва.</div>
+        <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 10 карточек онлайн</strong>. Визитов нет — пилот Москва + Брянск удалённо.</div>
         <div class="grid stats">
           <div class="card stat"><div class="label">В очереди сегодня</div><div class="value">${queue.length}</div></div>
           <div class="card stat"><div class="label">Открытых задач</div><div class="value">${open}</div></div>
