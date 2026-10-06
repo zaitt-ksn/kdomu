@@ -17,12 +17,17 @@
     <div class="page-bg" aria-hidden="true"></div>
     <header class="site-header">
       <a class="brand" href="./index.html">К дому</a>
-      <nav class="nav" aria-label="Основная навигация">
-        <a href="./index.html#animals">Животные</a>
-        <a href="./index.html#help">Помочь</a>
-        <a href="./index.html#shelters">Приютам</a>
-      </nav>
-      <a class="btn btn-small" href="./index.html#animals">К каталогу</a>
+      <div class="header-actions">
+        <nav class="nav" id="site-nav" aria-label="Основная навигация">
+          <a href="./index.html#animals">Животные</a>
+          <a href="./index.html#help">Помочь</a>
+          <a href="./index.html#shelters">Приюты</a>
+        </nav>
+        <a class="btn btn-small header-cta" href="./index.html#animals">К каталогу</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </header>
 
     <main class="section animal-page" id="animal-root">

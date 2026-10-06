@@ -20,12 +20,17 @@
     <div class="page-bg" aria-hidden="true"></div>
     <header class="site-header">
       <a class="brand" href="./index.html">К дому</a>
-      <nav class="nav">
-        <a href="./index.html#animals">Животные</a>
-        <a href="./index.html#shelters">Приюты</a>
-        <a href="./volunteer.html">Календарь</a>
-      </nav>
-      <a class="btn btn-small" href="./admin-slots.html">Слоты</a>
+      <div class="header-actions">
+        <nav class="nav" id="site-nav">
+          <a href="./index.html#animals">Животные</a>
+          <a href="./index.html#shelters">Приюты</a>
+          <a href="./volunteer.html">Календарь</a>
+        </nav>
+        <a class="btn btn-small header-cta" href="./admin-slots.html">Слоты</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </header>
 
     <main class="section volunteer-page">

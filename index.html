@@ -21,16 +21,27 @@
 
     <header class="site-header">
       <a class="brand" href="#top" aria-label="К дому — на главную">К дому</a>
-      <nav class="nav" aria-label="Основная навигация">
-        <a href="#animals">Животные</a>
-        <a href="#how">Как это работает</a>
-        <a href="#help">Помочь</a>
-        <a href="./help-money.html">Деньги</a>
-        <a href="#shelters">Приюты</a>
-        <a href="#volunteer">Волонтёрам</a>
-        <a href="./for-shelters.html">Подключить приют</a>
-      </nav>
-      <a class="btn btn-small" href="./for-shelters.html">Приютам</a>
+      <div class="header-actions">
+        <nav class="nav" id="site-nav" aria-label="Основная навигация">
+          <a href="#animals">Животные</a>
+          <a href="#how">Как это работает</a>
+          <a href="#help">Помочь</a>
+          <a href="./help-money.html">Деньги</a>
+          <a href="#shelters">Приюты</a>
+          <a href="#volunteer">Волонтёрам</a>
+          <a href="./for-shelters.html">Подключить приют</a>
+        </nav>
+        <a class="btn btn-small header-cta" href="./for-shelters.html">Приютам</a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+          aria-label="Открыть меню"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </header>
 
     <main id="top">

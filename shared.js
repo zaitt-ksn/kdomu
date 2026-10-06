@@ -104,4 +104,42 @@ window.KdomuShared = {
         </div>
       </a>`;
   },
+
+  initNav() {
+    const header = document.querySelector(".site-header");
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".nav");
+    if (!header || !toggle || !nav) return;
+
+    const setOpen = (open) => {
+      header.classList.toggle("nav-open", open);
+      document.body.classList.toggle("nav-lock", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(!header.classList.contains("nav-open"));
+    });
+
+    nav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    window.addEventListener(
+      "resize",
+      () => {
+        if (window.innerWidth >= 980) setOpen(false);
+      },
+      { passive: true }
+    );
+  },
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.KdomuShared.initNav();
+});

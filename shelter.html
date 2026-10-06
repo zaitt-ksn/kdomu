@@ -17,12 +17,17 @@
     <div class="page-bg" aria-hidden="true"></div>
     <header class="site-header">
       <a class="brand" href="./index.html">К дому</a>
-      <nav class="nav">
-        <a href="./index.html#animals">Животные</a>
-        <a href="./index.html#shelters">Приюты</a>
-        <a href="./index.html#volunteer">Волонтёрам</a>
-      </nav>
-      <a class="btn btn-small" href="./index.html#shelters">Все приюты</a>
+      <div class="header-actions">
+        <nav class="nav" id="site-nav">
+          <a href="./index.html#animals">Животные</a>
+          <a href="./index.html#shelters">Приюты</a>
+          <a href="./index.html#volunteer">Волонтёрам</a>
+        </nav>
+        <a class="btn btn-small header-cta" href="./index.html#shelters">Все приюты</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </header>
 
     <main class="section" id="shelter-root">
