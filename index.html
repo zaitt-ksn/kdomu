@@ -26,7 +26,8 @@
         <a href="#how">Как это работает</a>
         <a href="#help">Помочь</a>
         <a href="#opeka">Опека</a>
-        <a href="#shelters">Приютам</a>
+        <a href="#shelters">Приюты</a>
+        <a href="#volunteer">Волонтёрам</a>
       </nav>
       <a class="btn btn-small" href="#animals">Смотреть</a>
     </header>
@@ -153,17 +154,39 @@
 
       <section class="section shelters-section" id="shelters">
         <div class="section-head">
-          <h2>Для приютов</h2>
+          <h2>Приюты пилота</h2>
           <p>
-            Разместите животных, получайте заявки и донаты в одном месте.
+            Страницы-заготовки: когда договоримся — заменим демо на реальных
+            животных.
           </p>
         </div>
-        <div class="shelter-cta">
+        <div class="shelter-grid" id="shelters-grid"></div>
+        <div class="shelter-cta" style="margin-top:1.5rem">
           <p>
-            Сейчас пилот в Москве на демо-данных. Хотите подключить приют —
-            напишите Ксении или пригласите волонтёром: добавим анкеты за 1 день.
+            Хотите подключить свой приют — напишите Ксении. Добавим страницу и
+            анкеты за 1 день.
           </p>
           <a class="btn" href="https://t.me/zaitt_ksn">Написать в Telegram</a>
+        </div>
+      </section>
+
+      <section class="section volunteer-section" id="volunteer">
+        <div class="help-panel volunteer-panel">
+          <div class="help-copy">
+            <h2>Волонтёрам</h2>
+            <p>
+              Можно помочь руками: выгул, уборка, перевозка, фото для анкет.
+              Пока без сложного календаря — заявка придёт Ксении, она сведёт с
+              приютом.
+            </p>
+            <div class="hero-actions">
+              <button class="btn" type="button" id="volunteer-open">
+                Хочу помочь
+              </button>
+              <a class="btn btn-ghost" href="#shelters">Смотреть приюты</a>
+            </div>
+          </div>
+          <div class="help-visual volunteer-visual" aria-hidden="true"></div>
         </div>
       </section>
     </main>
@@ -238,9 +261,34 @@
       </form>
     </dialog>
 
+    <dialog class="modal" id="volunteer-modal" aria-labelledby="volunteer-title">
+      <form method="dialog" class="modal-card" id="volunteer-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+        <h2 id="volunteer-title">Стать волонтёром</h2>
+        <p class="modal-lead">Короткая заявка — без регистрации.</p>
+        <label>Имя <input name="name" type="text" required /></label>
+        <label>Контакт <input name="contact" type="text" required placeholder="Telegram или телефон" /></label>
+        <label>Чем можете помочь
+          <select name="help" required>
+            <option value="выгул">Выгул</option>
+            <option value="уборка">Уборка</option>
+            <option value="перевозка">Перевозка</option>
+            <option value="фото">Фото для анкет</option>
+            <option value="другое">Другое</option>
+          </select>
+        </label>
+        <label>Когда удобно <input name="when" type="text" placeholder="выходные / будни вечером" /></label>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">Отмена</button>
+          <button class="btn" value="default" type="submit">Отправить</button>
+        </div>
+      </form>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
     <script src="data.js"></script>
+    <script src="shared.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

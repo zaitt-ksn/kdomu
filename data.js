@@ -6,6 +6,7 @@ window.KDOMU_ANIMALS = [
     age: "3 года",
     city: "Москва",
     shelter: "Некрасовка",
+    shelterId: "nekrasovka",
     temperament: "Спокойный, ладит с детьми",
     description:
       "Крупный добрый пёс. Гуляет спокойно, знает базовые команды, ищет дом без суеты.",
@@ -19,6 +20,7 @@ window.KDOMU_ANIMALS = [
     age: "1 год",
     city: "Москва",
     shelter: "Некрасовка",
+    shelterId: "nekrasovka",
     temperament: "Игривая, любопытная",
     description:
       "Молодая кошка с мягким характером. Любит играть и сидеть на подоконнике.",
@@ -32,6 +34,7 @@ window.KDOMU_ANIMALS = [
     age: "5 лет",
     city: "Москва",
     shelter: "ЮАО",
+    shelterId: "uao",
     temperament: "Независимый, ласковый вечером",
     description:
       "Взрослый кот для спокойного дома. Приучен к лотку, стерилизован.",
@@ -45,6 +48,7 @@ window.KDOMU_ANIMALS = [
     age: "2 года",
     city: "Москва",
     shelter: "Искра",
+    shelterId: "iskra",
     temperament: "Энергичный, умный",
     description:
       "Активный пёс для семьи, которая любит прогулки и тренировки.",
@@ -58,6 +62,7 @@ window.KDOMU_ANIMALS = [
     age: "8 месяцев",
     city: "Москва",
     shelter: "Ласковый зверь",
+    shelterId: "laskovyy-zver",
     temperament: "Дружелюбная, учится быстро",
     description:
       "Подросток с мягким взглядом. Идеальна для первого опыта с собакой.",
@@ -71,6 +76,7 @@ window.KDOMU_ANIMALS = [
     age: "2 года",
     city: "Москва",
     shelter: "Искра",
+    shelterId: "iskra",
     temperament: "Ласковая, тихая",
     description:
       "Кошка-обнимашка. Любит тишину, пледы и размеренный день.",
@@ -84,6 +90,7 @@ window.KDOMU_ANIMALS = [
     age: "4 года",
     city: "Москва",
     shelter: "ЮАО",
+    shelterId: "uao",
     temperament: "Сдержанный, верный",
     description:
       "Собака для одного надёжного человека. Спокойно остаётся дома.",
@@ -97,6 +104,7 @@ window.KDOMU_ANIMALS = [
     age: "7 месяцев",
     city: "Москва",
     shelter: "Ласковый зверь",
+    shelterId: "laskovyy-zver",
     temperament: "Игривая, социальная",
     description:
       "Котёнок-подросток. Легко идёт на контакт, ищет дом с игрушками.",

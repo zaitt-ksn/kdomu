@@ -1,19 +1,7 @@
 (() => {
-  const STORAGE_ANIMALS = "kdomu_animals_v1";
-  const TG = "zaitt_ksn";
+  const S = window.KdomuShared;
 
-  function loadAnimals() {
-    try {
-      const raw = localStorage.getItem(STORAGE_ANIMALS);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      }
-    } catch (_) {}
-    return window.KDOMU_ANIMALS || [];
-  }
-
-  const animals = loadAnimals();
+  const animals = S.loadAnimals();
   const grid = document.getElementById("animal-grid");
   const typeFilter = document.getElementById("filter-type");
   const cityFilter = document.getElementById("filter-city");
@@ -24,10 +12,12 @@
   const sponsorOpen = document.getElementById("sponsor-open");
   const sponsorModal = document.getElementById("sponsor-modal");
   const sponsorForm = document.getElementById("sponsor-form");
+  const volunteerOpen = document.getElementById("volunteer-open");
+  const volunteerModal = document.getElementById("volunteer-modal");
+  const volunteerForm = document.getElementById("volunteer-form");
+  const sheltersGrid = document.getElementById("shelters-grid");
   const toast = document.getElementById("toast");
   const header = document.querySelector(".site-header");
-
-  const typeLabel = { dog: "Собака", cat: "Кошка" };
 
   function uniqueCities() {
     return [...new Set(animals.map((a) => a.city))].sort((a, b) =>
@@ -66,24 +56,23 @@
       return;
     }
 
-    grid.innerHTML = list
-      .map(
-        (animal) => `
-      <a class="animal-card" href="./animal.html?id=${encodeURIComponent(animal.id)}" aria-label="Открыть анкету ${animal.name}">
-        <div class="animal-photo">
-          <img src="${animal.image}" alt="${animal.name}" loading="lazy" width="900" height="1125" />
-        </div>
-        <div class="animal-meta">
-          <h3>${animal.name}</h3>
-          <p>${animal.age} · ${animal.shelter} · ${animal.city}</p>
-          <p>${animal.temperament}</p>
-          <div class="animal-tags">
-            <span>${typeLabel[animal.type]}</span>
-            <span>Смотреть анкету</span>
-          </div>
-        </div>
-      </a>`
-      )
+    grid.innerHTML = list.map((animal) => S.cardHtml(animal)).join("");
+  }
+
+  function renderShelters() {
+    if (!sheltersGrid) return;
+    const list = window.KDOMU_SHELTERS || [];
+    sheltersGrid.innerHTML = list
+      .map((s) => {
+        const count = S.animalsForShelter(s.id).length;
+        return `
+        <a class="shelter-card" href="./shelter.html?id=${encodeURIComponent(s.id)}">
+          <p class="animal-kicker">${s.city}</p>
+          <h3>${s.name}</h3>
+          <p>${s.type}</p>
+          <p class="tiny muted">На витрине: ${count}</p>
+        </a>`;
+      })
       .join("");
   }
 
@@ -97,33 +86,17 @@
     }, 2800);
   }
 
-  function saveLocal(key, payload) {
-    const existing = JSON.parse(localStorage.getItem(key) || "[]");
-    existing.push({ ...payload, createdAt: new Date().toISOString() });
-    localStorage.setItem(key, JSON.stringify(existing));
-  }
-
-  function openTelegram(text) {
-    window.open(
-      `https://t.me/${TG}?text=${encodeURIComponent(text)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
-  }
-
   typeFilter.addEventListener("change", render);
   cityFilter.addEventListener("change", render);
 
   if (donateOpen) {
-    donateOpen.addEventListener("click", () => {
-      if (donateModal.showModal) donateModal.showModal();
-    });
+    donateOpen.addEventListener("click", () => donateModal.showModal());
   }
-
   if (sponsorOpen) {
-    sponsorOpen.addEventListener("click", () => {
-      if (sponsorModal.showModal) sponsorModal.showModal();
-    });
+    sponsorOpen.addEventListener("click", () => sponsorModal.showModal());
+  }
+  if (volunteerOpen) {
+    volunteerOpen.addEventListener("click", () => volunteerModal.showModal());
   }
 
   if (donateForm) {
@@ -136,8 +109,8 @@
         amount: Number(data.get("amount")),
         contact: data.get("contact"),
       };
-      saveLocal("kdomu_donations", payload);
-      openTelegram(
+      S.saveLocal("kdomu_donations", payload);
+      S.openTelegram(
         `Хочу помочь приюту через «К дому»\nСумма: ${payload.amount} ₽\nКонтакт: ${payload.contact}`
       );
       donateModal.close();
@@ -157,8 +130,8 @@
         amount: Number(data.get("amount")),
         contact: data.get("contact"),
       };
-      saveLocal("kdomu_sponsors", payload);
-      openTelegram(
+      S.saveLocal("kdomu_sponsors", payload);
+      S.openTelegram(
         [
           "Хочу взять животное на опеку · К дому",
           payload.animalHint ? `Кого: ${payload.animalHint}` : "Кого: подскажите сами",
@@ -172,6 +145,36 @@
     });
   }
 
+  if (volunteerForm) {
+    volunteerForm.addEventListener("submit", (event) => {
+      const submitter = event.submitter;
+      if (!submitter || submitter.value === "cancel") return;
+      event.preventDefault();
+      const data = new FormData(volunteerForm);
+      const payload = {
+        name: data.get("name"),
+        contact: data.get("contact"),
+        help: data.get("help"),
+        when: data.get("when"),
+      };
+      S.saveLocal("kdomu_volunteers", payload);
+      S.openTelegram(
+        [
+          "Хочу стать волонтёром · К дому",
+          `Имя: ${payload.name}`,
+          `Контакт: ${payload.contact}`,
+          `Чем помочь: ${payload.help}`,
+          payload.when ? `Когда: ${payload.when}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      );
+      volunteerModal.close();
+      volunteerForm.reset();
+      showToast("Откроется Telegram — отправьте заявку");
+    });
+  }
+
   window.addEventListener(
     "scroll",
     () => {
@@ -182,4 +185,5 @@
 
   fillCities();
   render();
+  renderShelters();
 })();

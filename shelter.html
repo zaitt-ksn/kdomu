@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — приют</title>
+    <meta name="description" content="Страница приюта на «К дому»" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="./index.html">К дому</a>
+      <nav class="nav">
+        <a href="./index.html#animals">Животные</a>
+        <a href="./index.html#shelters">Приюты</a>
+        <a href="./index.html#volunteer">Волонтёрам</a>
+      </nav>
+      <a class="btn btn-small" href="./index.html#shelters">Все приюты</a>
+    </header>
+
+    <main class="section" id="shelter-root">
+      <p>Загружаем…</p>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="data.js"></script>
+    <script src="shared.js"></script>
+    <script src="shelter.js"></script>
+  </body>
+</html>

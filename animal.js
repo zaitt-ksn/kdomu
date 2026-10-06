@@ -65,7 +65,7 @@
       <div class="animal-copy">
         <p class="animal-kicker">${typeLabel[animal.type] || ""} · ${animal.city}</p>
         <h1>${animal.name}</h1>
-        <p class="animal-sub">${animal.age}${animal.sex ? " · " + animal.sex : ""} · ${animal.shelter}</p>
+        <p class="animal-sub">${animal.age}${animal.sex ? " · " + animal.sex : ""} · <a href="./shelter.html?id=${encodeURIComponent(animal.shelterId || "")}">${animal.shelter}</a></p>
         <p class="animal-temper">${animal.temperament || ""}</p>
         <p class="animal-desc">${animal.description || ""}</p>
         ${animal.curator ? `<p class="animal-curator">Куратор: ${animal.curator}</p>` : ""}
