@@ -153,6 +153,7 @@
     openTelegram(
       [
         "Опека животного · К дому",
+        "Перевод хочу делать сразу приюту",
         `Животное: ${animal.name} (${animal.shelter})`,
         `Ссылка: ${shareUrl}`,
         `Сумма в месяц: ${payload.amount} ₽`,

@@ -111,7 +111,13 @@
       };
       S.saveLocal("kdomu_donations", payload);
       S.openTelegram(
-        `Хочу помочь приюту через «К дому»\nСумма: ${payload.amount} ₽\nКонтакт: ${payload.contact}`
+        [
+          "Хочу помочь приюту деньгами · К дому",
+          "Важно: перевод сразу приюту, не через вас",
+          `Сумма: ${payload.amount} ₽`,
+          `Контакт: ${payload.contact}`,
+          "Пришлите, пожалуйста, реквизиты приюта",
+        ].join("\n")
       );
       donateModal.close();
       donateForm.reset();
@@ -134,6 +140,7 @@
       S.openTelegram(
         [
           "Хочу взять животное на опеку · К дому",
+          "Перевод хочу делать сразу приюту",
           payload.animalHint ? `Кого: ${payload.animalHint}` : "Кого: подскажите сами",
           `Сумма в месяц: ${payload.amount} ₽`,
           `Контакт: ${payload.contact}`,
