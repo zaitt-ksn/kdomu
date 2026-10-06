@@ -60,6 +60,7 @@
 - [x] Страницы приютов (`shelter.html?id=…`)  
 - [x] Блок заявок волонтёрам  
 - [x] Календарь волонтёрских слотов (`volunteer.html` + `admin-slots.html`)  
+- [x] One-pager для приютов (`for-shelters.html`) + полировка демо  
 
 ### Ещё не сделано
 - [ ] Outreach / визиты — **на паузе по решению Ксении**  
@@ -75,8 +76,7 @@
 
 ## C. Фокус прямо сейчас
 
-Outreach на паузе. Календарь готов:
-- https://zaitt-ksn.github.io/kdomu/volunteer.html  
-- админка слотов: https://zaitt-ksn.github.io/kdomu/admin-slots.html  
+Ссылка для приютов: **https://zaitt-ksn.github.io/kdomu/for-shelters.html**  
+Витрина: https://zaitt-ksn.github.io/kdomu/  
 
-Следующий технический шаг: **оплата донатов** или полировка под первый приют.
+Дальше по смыслу — снова **первый живой приют**.

@@ -27,7 +27,7 @@
         <button class="btn" type="button" id="help-shelter">Хочу помочь приюту</button>
         <button class="btn btn-ghost" type="button" id="copy-shelter">Скопировать ссылку</button>
       </div>
-      <p class="tiny muted" style="margin-top:0.8rem">Контакт в пилоте: ${shelter.contact || "—"}</p>
+      <p class="tiny muted" style="margin-top:0.8rem">Связь: ${shelter.contact || "—"}</p>
     </div>
     <div class="section-head" style="margin-top:2.5rem">
       <h2>Животные приюта</h2>
