@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — карточка животного</title>
+    <meta name="description" content="Анкеты животных из приютов Москвы · К дому" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="./index.html">К дому</a>
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="./index.html#animals">Животные</a>
+        <a href="./index.html#help">Помочь</a>
+        <a href="./index.html#shelters">Приютам</a>
+      </nav>
+      <a class="btn btn-small" href="./index.html#animals">К каталогу</a>
+    </header>
+
+    <main class="section animal-page" id="animal-root">
+      <p class="animal-loading">Загружаем анкету…</p>
+    </main>
+
+    <dialog class="modal" id="adopt-modal" aria-labelledby="adopt-title">
+      <form method="dialog" class="modal-card" id="adopt-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+        <h2 id="adopt-title">Заявка на усыновление</h2>
+        <p class="modal-lead" id="adopt-animal-name"></p>
+        <label>Ваше имя <input name="name" type="text" required autocomplete="name" /></label>
+        <label
+          >Телефон или Telegram
+          <input name="contact" type="text" required placeholder="+7… или @username" />
+        </label>
+        <label
+          >Коротко о себе
+          <textarea name="message" rows="3" placeholder="Жильё, опыт, почему этот питомец"></textarea>
+        </label>
+        <input type="hidden" name="animalId" id="adopt-animal-id" />
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">Отмена</button>
+          <button class="btn" value="default" type="submit">Отправить заявку</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="sponsor-modal" aria-labelledby="sponsor-title">
+      <form method="dialog" class="modal-card" id="sponsor-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+        <h2 id="sponsor-title">Взять на опеку</h2>
+        <p class="modal-lead" id="sponsor-animal-name"></p>
+        <label
+          >Сумма в месяц, ₽
+          <input name="amount" type="number" min="300" step="100" value="1000" required />
+        </label>
+        <label
+          >Контакт
+          <input name="contact" type="text" required placeholder="Telegram или телефон" />
+        </label>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">Отмена</button>
+          <button class="btn" value="default" type="submit">Хочу опекать</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="data.js"></script>
+    <script src="animal.js"></script>
+  </body>
+</html>

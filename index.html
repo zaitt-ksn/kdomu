@@ -25,6 +25,7 @@
         <a href="#animals">Животные</a>
         <a href="#how">Как это работает</a>
         <a href="#help">Помочь</a>
+        <a href="#opeka">Опека</a>
         <a href="#shelters">Приютам</a>
       </nav>
       <a class="btn btn-small" href="#animals">Смотреть</a>
@@ -110,18 +111,44 @@
           <div class="help-copy">
             <h2>Не готовы взять — можно помочь</h2>
             <p>
-              Корм, лечение и передержки держатся на людях. Поддержите приют
-              разово или возьмите животное на ежемесячную опеку.
+              Разовый донат — на корм и лечение. Опека — ежемесячная поддержка
+              конкретного животного с короткими новостями от приюта.
             </p>
             <div class="hero-actions">
               <button class="btn" type="button" id="donate-open">
-                Помочь сейчас
+                Помочь разово
               </button>
-              <a class="btn btn-ghost" href="#animals">Сначала посмотреть</a>
+              <button class="btn btn-ghost" type="button" id="sponsor-open">
+                Взять на опеку
+              </button>
             </div>
           </div>
           <div class="help-visual" aria-hidden="true"></div>
         </div>
+      </section>
+
+      <section class="section opeka-section" id="opeka">
+        <div class="section-head">
+          <h2>Как работает опека</h2>
+          <p>Простая поддержка без оформления «на себя» животного.</p>
+        </div>
+        <ol class="steps">
+          <li>
+            <span class="step-num">01</span>
+            <h3>Выбираете питомца</h3>
+            <p>В каталоге или просите нас подсказать, кому помощь нужнее.</p>
+          </li>
+          <li>
+            <span class="step-num">02</span>
+            <h3>Договоритесь о сумме</h3>
+            <p>Обычно от 500–1500 ₽ в месяц — на корм, лечение, наполнитель.</p>
+          </li>
+          <li>
+            <span class="step-num">03</span>
+            <h3>Получаете новости</h3>
+            <p>Приют или куратор присылает короткие обновления и фото.</p>
+          </li>
+        </ol>
       </section>
 
       <section class="section shelters-section" id="shelters">
@@ -153,50 +180,6 @@
       </p>
     </footer>
 
-    <dialog class="modal" id="adopt-modal" aria-labelledby="adopt-title">
-      <form method="dialog" class="modal-card" id="adopt-form">
-        <button class="modal-close" value="cancel" aria-label="Закрыть">
-          ×
-        </button>
-        <h2 id="adopt-title">Заявка на усыновление</h2>
-        <p class="modal-lead" id="adopt-animal-name"></p>
-
-        <label>
-          Ваше имя
-          <input name="name" type="text" required autocomplete="name" />
-        </label>
-        <label>
-          Телефон или Telegram
-          <input
-            name="contact"
-            type="text"
-            required
-            placeholder="+7… или @username"
-            autocomplete="tel"
-          />
-        </label>
-        <label>
-          Коротко о себе
-          <textarea
-            name="message"
-            rows="3"
-            placeholder="Жильё, опыт, почему этот питомец"
-          ></textarea>
-        </label>
-
-        <input type="hidden" name="animalId" id="adopt-animal-id" />
-
-        <div class="modal-actions">
-          <button class="btn btn-ghost" value="cancel" type="submit">
-            Отмена
-          </button>
-          <button class="btn" id="adopt-submit" value="default" type="submit">
-            Отправить заявку
-          </button>
-        </div>
-      </form>
-    </dialog>
-
     <dialog class="modal" id="donate-modal" aria-labelledby="donate-title">
       <form method="dialog" class="modal-card" id="donate-form">
         <button class="modal-close" value="cancel" aria-label="Закрыть">
@@ -204,8 +187,8 @@
         </button>
         <h2 id="donate-title">Помочь приюту</h2>
         <p class="modal-lead">
-          В MVP это демо-форма: заявку сохраним локально и покажем, как будет
-          выглядеть поток помощи.
+          Пока без онлайн-оплаты: заявка уйдёт Ксении в Telegram, подскажем, как
+          перевести приюту.
         </p>
         <label>
           Сумма, ₽
@@ -220,6 +203,37 @@
             Отмена
           </button>
           <button class="btn" value="default" type="submit">Продолжить</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="sponsor-modal" aria-labelledby="sponsor-title">
+      <form method="dialog" class="modal-card" id="sponsor-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">
+          ×
+        </button>
+        <h2 id="sponsor-title">Взять на опеку</h2>
+        <p class="modal-lead">
+          Ежемесячная поддержка. Можно указать имя животного или попросить
+          подобрать.
+        </p>
+        <label>
+          Кого хотите опекать
+          <input name="animalHint" type="text" placeholder="Имя из каталога или «подскажите»" />
+        </label>
+        <label>
+          Сумма в месяц, ₽
+          <input name="amount" type="number" min="300" step="100" value="1000" required />
+        </label>
+        <label>
+          Контакт
+          <input name="contact" type="text" required placeholder="Telegram или телефон" />
+        </label>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">
+            Отмена
+          </button>
+          <button class="btn" value="default" type="submit">Хочу опекать</button>
         </div>
       </form>
     </dialog>

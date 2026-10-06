@@ -13,18 +13,17 @@
     return window.KDOMU_ANIMALS || [];
   }
 
-  let animals = loadAnimals();
+  const animals = loadAnimals();
   const grid = document.getElementById("animal-grid");
   const typeFilter = document.getElementById("filter-type");
   const cityFilter = document.getElementById("filter-city");
   const resultsCount = document.getElementById("results-count");
-  const adoptModal = document.getElementById("adopt-modal");
-  const adoptForm = document.getElementById("adopt-form");
-  const adoptAnimalName = document.getElementById("adopt-animal-name");
-  const adoptAnimalId = document.getElementById("adopt-animal-id");
   const donateModal = document.getElementById("donate-modal");
   const donateForm = document.getElementById("donate-form");
   const donateOpen = document.getElementById("donate-open");
+  const sponsorOpen = document.getElementById("sponsor-open");
+  const sponsorModal = document.getElementById("sponsor-modal");
+  const sponsorForm = document.getElementById("sponsor-form");
   const toast = document.getElementById("toast");
   const header = document.querySelector(".site-header");
 
@@ -59,9 +58,7 @@
   function render() {
     const list = filteredAnimals();
     resultsCount.textContent =
-      list.length === 0
-        ? "Никого не нашлось"
-        : `Найдено: ${list.length}`;
+      list.length === 0 ? "Никого не нашлось" : `Найдено: ${list.length}`;
 
     if (list.length === 0) {
       grid.innerHTML =
@@ -72,7 +69,7 @@
     grid.innerHTML = list
       .map(
         (animal) => `
-      <article class="animal-card" data-id="${animal.id}" tabindex="0" role="button" aria-label="Открыть заявку на ${animal.name}">
+      <a class="animal-card" href="./animal.html?id=${encodeURIComponent(animal.id)}" aria-label="Открыть анкету ${animal.name}">
         <div class="animal-photo">
           <img src="${animal.image}" alt="${animal.name}" loading="lazy" width="900" height="1125" />
         </div>
@@ -82,24 +79,12 @@
           <p>${animal.temperament}</p>
           <div class="animal-tags">
             <span>${typeLabel[animal.type]}</span>
-            <span>Усыновить</span>
+            <span>Смотреть анкету</span>
           </div>
         </div>
-      </article>`
+      </a>`
       )
       .join("");
-  }
-
-  function findAnimal(id) {
-    return animals.find((animal) => animal.id === id);
-  }
-
-  function openAdopt(id) {
-    const animal = findAnimal(id);
-    if (!animal || !adoptModal.showModal) return;
-    adoptAnimalId.value = animal.id;
-    adoptAnimalName.textContent = `${animal.name} · ${animal.shelter}, ${animal.city}`;
-    adoptModal.showModal();
   }
 
   function showToast(message) {
@@ -119,82 +104,73 @@
   }
 
   function openTelegram(text) {
-    const url = `https://t.me/${TG}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(
+      `https://t.me/${TG}?text=${encodeURIComponent(text)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
-
-  grid.addEventListener("click", (event) => {
-    const card = event.target.closest(".animal-card");
-    if (!card) return;
-    openAdopt(card.dataset.id);
-  });
-
-  grid.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const card = event.target.closest(".animal-card");
-    if (!card) return;
-    event.preventDefault();
-    openAdopt(card.dataset.id);
-  });
 
   typeFilter.addEventListener("change", render);
   cityFilter.addEventListener("change", render);
 
-  adoptForm.addEventListener("submit", (event) => {
-    const submitter = event.submitter;
-    if (!submitter || submitter.value === "cancel") return;
+  if (donateOpen) {
+    donateOpen.addEventListener("click", () => {
+      if (donateModal.showModal) donateModal.showModal();
+    });
+  }
 
-    event.preventDefault();
-    const data = new FormData(adoptForm);
-    const animal = findAnimal(String(data.get("animalId")));
-    const payload = {
-      animalId: data.get("animalId"),
-      animalName: animal?.name || "",
-      shelter: animal?.shelter || "",
-      name: data.get("name"),
-      contact: data.get("contact"),
-      message: data.get("message"),
-    };
-    saveLocal("kdomu_adopt_requests", payload);
+  if (sponsorOpen) {
+    sponsorOpen.addEventListener("click", () => {
+      if (sponsorModal.showModal) sponsorModal.showModal();
+    });
+  }
 
-    const tgText = [
-      "Заявка на усыновление · К дому",
-      `Животное: ${payload.animalName} (${payload.shelter})`,
-      `Имя: ${payload.name}`,
-      `Контакт: ${payload.contact}`,
-      payload.message ? `Сообщение: ${payload.message}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
+  if (donateForm) {
+    donateForm.addEventListener("submit", (event) => {
+      const submitter = event.submitter;
+      if (!submitter || submitter.value === "cancel") return;
+      event.preventDefault();
+      const data = new FormData(donateForm);
+      const payload = {
+        amount: Number(data.get("amount")),
+        contact: data.get("contact"),
+      };
+      saveLocal("kdomu_donations", payload);
+      openTelegram(
+        `Хочу помочь приюту через «К дому»\nСумма: ${payload.amount} ₽\nКонтакт: ${payload.contact}`
+      );
+      donateModal.close();
+      donateForm.reset();
+      showToast("Откроется Telegram — отправьте сообщение");
+    });
+  }
 
-    openTelegram(tgText);
-    adoptModal.close();
-    adoptForm.reset();
-    showToast("Заявка готова — отправьте сообщение в Telegram");
-  });
-
-  donateOpen.addEventListener("click", () => {
-    if (donateModal.showModal) donateModal.showModal();
-  });
-
-  donateForm.addEventListener("submit", (event) => {
-    const submitter = event.submitter;
-    if (!submitter || submitter.value === "cancel") return;
-
-    event.preventDefault();
-    const data = new FormData(donateForm);
-    const payload = {
-      amount: Number(data.get("amount")),
-      contact: data.get("contact"),
-    };
-    saveLocal("kdomu_donations", payload);
-    openTelegram(
-      `Хочу помочь приюту через «К дому»\nСумма: ${payload.amount} ₽\nКонтакт: ${payload.contact}`
-    );
-    donateModal.close();
-    donateForm.reset();
-    showToast("Откроется Telegram — отправьте сообщение Ксении");
-  });
+  if (sponsorForm) {
+    sponsorForm.addEventListener("submit", (event) => {
+      const submitter = event.submitter;
+      if (!submitter || submitter.value === "cancel") return;
+      event.preventDefault();
+      const data = new FormData(sponsorForm);
+      const payload = {
+        animalHint: data.get("animalHint") || "",
+        amount: Number(data.get("amount")),
+        contact: data.get("contact"),
+      };
+      saveLocal("kdomu_sponsors", payload);
+      openTelegram(
+        [
+          "Хочу взять животное на опеку · К дому",
+          payload.animalHint ? `Кого: ${payload.animalHint}` : "Кого: подскажите сами",
+          `Сумма в месяц: ${payload.amount} ₽`,
+          `Контакт: ${payload.contact}`,
+        ].join("\n")
+      );
+      sponsorModal.close();
+      sponsorForm.reset();
+      showToast("Откроется Telegram — подтвердите опеку");
+    });
+  }
 
   window.addEventListener(
     "scroll",
