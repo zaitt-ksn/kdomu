@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — админка карточек</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,650;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin {
+        width: min(960px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 4rem;
+      }
+      .admin h1 {
+        font-family: var(--font-display);
+        margin: 0 0 0.4rem;
+      }
+      .admin-lead {
+        color: var(--ink-soft);
+        margin: 0 0 1.25rem;
+      }
+      .admin-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+      }
+      .admin-form,
+      .admin-list article {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        margin-bottom: 1rem;
+      }
+      .admin-form {
+        display: grid;
+        gap: 0.75rem;
+      }
+      .admin-form .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .admin-form label {
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+      }
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.7rem 0.85rem;
+        background: #fff;
+        font: inherit;
+      }
+      .admin-list article {
+        display: grid;
+        grid-template-columns: 88px 1fr auto;
+        gap: 0.9rem;
+        align-items: center;
+      }
+      .admin-list img {
+        width: 88px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 12px;
+      }
+      .admin-list h3 {
+        margin: 0;
+        font-family: var(--font-display);
+      }
+      .admin-list p {
+        margin: 0.25rem 0 0;
+        color: var(--ink-soft);
+        font-size: 0.92rem;
+      }
+      @media (max-width: 700px) {
+        .admin-form .row2,
+        .admin-list article {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="./index.html">К дому</a>
+      <nav class="nav">
+        <a href="./index.html">Сайт</a>
+        <a href="./crm/">CRM</a>
+        <a href="./VISIT-CHECKLIST.md">Чеклист визита</a>
+      </nav>
+      <a class="btn btn-small" href="./index.html">На сайт</a>
+    </header>
+
+    <main class="admin">
+      <h1>Админка карточек</h1>
+      <p class="admin-lead">
+        Добавляйте реальных животных после визита в приют. Сохраняется в этом
+        браузере и сразу видно на сайте. Можно скачать <code>data.js</code> для
+        выкладки онлайн.
+      </p>
+
+      <div class="admin-toolbar">
+        <button class="btn" type="button" id="load-demo">Загрузить демо</button>
+        <button class="btn" type="button" id="export-js">Скачать data.js</button>
+        <button class="btn" type="button" id="export-json">Скачать JSON</button>
+        <label class="btn btn-ghost" style="cursor: pointer">
+          Импорт JSON
+          <input id="import-json" type="file" accept="application/json,.json" hidden />
+        </label>
+        <button class="btn btn-ghost" type="button" id="clear-all">Очистить</button>
+      </div>
+
+      <form class="admin-form" id="animal-form">
+        <input type="hidden" id="edit-id" />
+        <div class="row2">
+          <label>Имя <input id="f-name" required /></label>
+          <label
+            >Вид
+            <select id="f-type">
+              <option value="dog">Собака</option>
+              <option value="cat">Кошка</option>
+            </select>
+          </label>
+        </div>
+        <div class="row2">
+          <label>Возраст <input id="f-age" placeholder="2 года" required /></label>
+          <label>Пол <input id="f-sex" placeholder="мальчик / девочка" /></label>
+        </div>
+        <div class="row2">
+          <label>Город <input id="f-city" value="Москва" required /></label>
+          <label>Приют <input id="f-shelter" required /></label>
+        </div>
+        <label>Характер в 1 предложении <input id="f-temperament" required /></label>
+        <label>Описание <textarea id="f-description" rows="3"></textarea></label>
+        <label
+          >Ссылка на фото
+          <input id="f-image" placeholder="https://..." required />
+        </label>
+        <label
+          >Контакт куратора
+          <input id="f-curator" placeholder="телефон / Telegram" />
+        </label>
+        <div class="admin-toolbar">
+          <button class="btn" type="submit" id="save-btn">Добавить карточку</button>
+          <button class="btn btn-ghost" type="button" id="cancel-edit" hidden>
+            Отменить редактирование
+          </button>
+        </div>
+      </form>
+
+      <div class="admin-list" id="list"></div>
+    </main>
+
+    <script src="./data.js"></script>
+    <script>
+      const KEY = "kdomu_animals_v1";
+      const form = document.getElementById("animal-form");
+      const list = document.getElementById("list");
+      const editId = document.getElementById("edit-id");
+      const cancelEdit = document.getElementById("cancel-edit");
+      const saveBtn = document.getElementById("save-btn");
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (_) {}
+        return structuredClone(window.KDOMU_ANIMALS || []);
+      }
+
+      function save(animals) {
+        localStorage.setItem(KEY, JSON.stringify(animals));
+        render();
+      }
+
+      let animals = load();
+
+      function uid() {
+        return "a_" + Math.random().toString(36).slice(2, 9);
+      }
+
+      function resetForm() {
+        form.reset();
+        editId.value = "";
+        document.getElementById("f-city").value = "Москва";
+        cancelEdit.hidden = true;
+        saveBtn.textContent = "Добавить карточку";
+      }
+
+      function render() {
+        if (!animals.length) {
+          list.innerHTML = '<p class="admin-lead">Пока пусто — добавьте первую карточку.</p>';
+          return;
+        }
+        list.innerHTML = animals
+          .map(
+            (a) => `
+          <article>
+            <img src="${a.image}" alt="${a.name}" />
+            <div>
+              <h3>${a.name}</h3>
+              <p>${a.type === "dog" ? "Собака" : "Кошка"} · ${a.age} · ${a.shelter} · ${a.city}</p>
+              <p>${a.temperament || ""}</p>
+            </div>
+            <div class="admin-toolbar">
+              <button class="btn btn-small" type="button" data-edit="${a.id}">Изменить</button>
+              <button class="btn btn-small btn-ghost" type="button" data-del="${a.id}">Удалить</button>
+            </div>
+          </article>`
+          )
+          .join("");
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const item = {
+          id: editId.value || uid(),
+          name: document.getElementById("f-name").value.trim(),
+          type: document.getElementById("f-type").value,
+          age: document.getElementById("f-age").value.trim(),
+          sex: document.getElementById("f-sex").value.trim(),
+          city: document.getElementById("f-city").value.trim(),
+          shelter: document.getElementById("f-shelter").value.trim(),
+          temperament: document.getElementById("f-temperament").value.trim(),
+          description: document.getElementById("f-description").value.trim(),
+          image: document.getElementById("f-image").value.trim(),
+          curator: document.getElementById("f-curator").value.trim(),
+        };
+        const idx = animals.findIndex((a) => a.id === item.id);
+        if (idx >= 0) animals[idx] = item;
+        else animals.unshift(item);
+        save(animals);
+        resetForm();
+      });
+
+      list.addEventListener("click", (e) => {
+        const del = e.target.closest("[data-del]");
+        const ed = e.target.closest("[data-edit]");
+        if (del) {
+          animals = animals.filter((a) => a.id !== del.dataset.del);
+          save(animals);
+        }
+        if (ed) {
+          const a = animals.find((x) => x.id === ed.dataset.edit);
+          if (!a) return;
+          editId.value = a.id;
+          document.getElementById("f-name").value = a.name || "";
+          document.getElementById("f-type").value = a.type || "dog";
+          document.getElementById("f-age").value = a.age || "";
+          document.getElementById("f-sex").value = a.sex || "";
+          document.getElementById("f-city").value = a.city || "Москва";
+          document.getElementById("f-shelter").value = a.shelter || "";
+          document.getElementById("f-temperament").value = a.temperament || "";
+          document.getElementById("f-description").value = a.description || "";
+          document.getElementById("f-image").value = a.image || "";
+          document.getElementById("f-curator").value = a.curator || "";
+          cancelEdit.hidden = false;
+          saveBtn.textContent = "Сохранить изменения";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      cancelEdit.addEventListener("click", resetForm);
+
+      document.getElementById("load-demo").onclick = () => {
+        animals = structuredClone(window.KDOMU_ANIMALS || []);
+        save(animals);
+      };
+      document.getElementById("clear-all").onclick = () => {
+        if (!confirm("Удалить все карточки в этом браузере?")) return;
+        animals = [];
+        save(animals);
+      };
+      document.getElementById("export-json").onclick = () => {
+        const blob = new Blob([JSON.stringify(animals, null, 2)], {
+          type: "application/json",
+        });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "kdomu-animals.json";
+        a.click();
+      };
+      document.getElementById("export-js").onclick = () => {
+        const body =
+          "window.KDOMU_ANIMALS = " + JSON.stringify(animals, null, 2) + ";\n";
+        const blob = new Blob([body], { type: "text/javascript" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "data.js";
+        a.click();
+      };
+      document.getElementById("import-json").onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            animals = JSON.parse(String(reader.result));
+            save(animals);
+          } catch (_) {
+            alert("Не удалось прочитать JSON");
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      render();
+    </script>
+  </body>
+</html>

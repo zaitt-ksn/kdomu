@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>К дому — найти дом каждому животному</title>
+    <meta
+      name="description"
+      content="К дому помогает приютам находить хозяев для животных: каталог питомцев, заявки на усыновление и простая помощь приютам."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="К дому — на главную">К дому</a>
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="#animals">Животные</a>
+        <a href="#how">Как это работает</a>
+        <a href="#help">Помочь</a>
+        <a href="#shelters">Приютам</a>
+      </nav>
+      <a class="btn btn-small" href="#animals">Смотреть</a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-label="Главный экран">
+        <div class="hero-media">
+          <img
+            src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=2000&q=80"
+            alt="Собака и человек идут вместе на прогулке"
+            width="2000"
+            height="1333"
+          />
+        </div>
+        <div class="hero-content">
+          <p class="brand-mark">К дому</p>
+          <h1>Найдём дом каждому</h1>
+          <p class="hero-lead">
+            Пилот в Москве: каталог животных из приютов — и простая заявка на
+            усыновление без лишней бюрократии.
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="#animals">Смотреть животных</a>
+            <a class="btn btn-ghost" href="#help">Помочь приюту</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section animals-section" id="animals">
+        <div class="section-head">
+          <h2>Животные ищут дом в Москве</h2>
+          <p>Выберите питомца и оставьте заявку — приют свяжется с вами.</p>
+        </div>
+
+        <div class="filters" role="group" aria-label="Фильтры">
+          <label class="filter">
+            <span>Кто</span>
+            <select id="filter-type">
+              <option value="all">Все</option>
+              <option value="dog">Собаки</option>
+              <option value="cat">Кошки</option>
+            </select>
+          </label>
+          <label class="filter">
+            <span>Город</span>
+            <select id="filter-city">
+              <option value="all">Все города</option>
+            </select>
+          </label>
+          <p class="results-count" id="results-count" aria-live="polite"></p>
+        </div>
+
+        <div class="animal-grid" id="animal-grid"></div>
+      </section>
+
+      <section class="section how-section" id="how">
+        <div class="section-head">
+          <h2>Как это работает</h2>
+          <p>Три шага от знакомства до новой семьи.</p>
+        </div>
+        <ol class="steps">
+          <li>
+            <span class="step-num">01</span>
+            <h3>Найдите питомца</h3>
+            <p>Листайте каталог и выбирайте по виду, городу и характеру.</p>
+          </li>
+          <li>
+            <span class="step-num">02</span>
+            <h3>Оставьте заявку</h3>
+            <p>Короткая форма уходит прямо в приют — без регистрации.</p>
+          </li>
+          <li>
+            <span class="step-num">03</span>
+            <h3>Встретьтесь</h3>
+            <p>Приют свяжется с вами и поможет познакомиться лично.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section help-section" id="help">
+        <div class="help-panel">
+          <div class="help-copy">
+            <h2>Не готовы взять — можно помочь</h2>
+            <p>
+              Корм, лечение и передержки держатся на людях. Поддержите приют
+              разово или возьмите животное на ежемесячную опеку.
+            </p>
+            <div class="hero-actions">
+              <button class="btn" type="button" id="donate-open">
+                Помочь сейчас
+              </button>
+              <a class="btn btn-ghost" href="#animals">Сначала посмотреть</a>
+            </div>
+          </div>
+          <div class="help-visual" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="section shelters-section" id="shelters">
+        <div class="section-head">
+          <h2>Для приютов</h2>
+          <p>
+            Разместите животных, получайте заявки и донаты в одном месте.
+          </p>
+        </div>
+        <div class="shelter-cta">
+          <p>
+            Сейчас пилот в Москве на демо-данных. Хотите подключить приют —
+            напишите Ксении или пригласите волонтёром: добавим анкеты за 1 день.
+          </p>
+          <a class="btn" href="https://t.me/zaitt_ksn">Написать в Telegram</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p class="brand">К дому</p>
+      <p>MVP для помощи приютам · пилот в Москве · усыновление и простая поддержка</p>
+      <p style="margin-top:0.6rem">
+        <a href="./admin.html">Админка карточек</a>
+        ·
+        <a href="./crm/">CRM</a>
+        ·
+        <a href="https://t.me/zaitt_ksn">Telegram</a>
+      </p>
+    </footer>
+
+    <dialog class="modal" id="adopt-modal" aria-labelledby="adopt-title">
+      <form method="dialog" class="modal-card" id="adopt-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">
+          ×
+        </button>
+        <h2 id="adopt-title">Заявка на усыновление</h2>
+        <p class="modal-lead" id="adopt-animal-name"></p>
+
+        <label>
+          Ваше имя
+          <input name="name" type="text" required autocomplete="name" />
+        </label>
+        <label>
+          Телефон или Telegram
+          <input
+            name="contact"
+            type="text"
+            required
+            placeholder="+7… или @username"
+            autocomplete="tel"
+          />
+        </label>
+        <label>
+          Коротко о себе
+          <textarea
+            name="message"
+            rows="3"
+            placeholder="Жильё, опыт, почему этот питомец"
+          ></textarea>
+        </label>
+
+        <input type="hidden" name="animalId" id="adopt-animal-id" />
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">
+            Отмена
+          </button>
+          <button class="btn" id="adopt-submit" value="default" type="submit">
+            Отправить заявку
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="donate-modal" aria-labelledby="donate-title">
+      <form method="dialog" class="modal-card" id="donate-form">
+        <button class="modal-close" value="cancel" aria-label="Закрыть">
+          ×
+        </button>
+        <h2 id="donate-title">Помочь приюту</h2>
+        <p class="modal-lead">
+          В MVP это демо-форма: заявку сохраним локально и покажем, как будет
+          выглядеть поток помощи.
+        </p>
+        <label>
+          Сумма, ₽
+          <input name="amount" type="number" min="100" step="100" value="500" required />
+        </label>
+        <label>
+          Контакт для отчёта
+          <input name="contact" type="text" required placeholder="email или Telegram" />
+        </label>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="cancel" type="submit">
+            Отмена
+          </button>
+          <button class="btn" value="default" type="submit">Продолжить</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>К дому · Outreach CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,650;9..144,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #16241f;
+      --ink-soft: #3d5249;
+      --foam: #f3f7f4;
+      --mist: #d7e5dc;
+      --leaf: #2f6b52;
+      --leaf-deep: #1d4636;
+      --sun: #e2b15a;
+      --sun-deep: #c9922f;
+      --line: rgba(22, 36, 31, 0.12);
+      --shadow: 0 18px 50px rgba(22, 36, 31, 0.14);
+      --danger: #9b4a3c;
+      --info: #3d6b7a;
+      --radius: 16px;
+      --font: "Figtree", "Segoe UI", sans-serif;
+      --font-display: "Fraunces", Georgia, serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --bg: var(--foam);
+      --bg2: rgba(255, 255, 255, 0.82);
+      --bg3: #eaf2ec;
+      --text: var(--ink);
+      --muted: var(--ink-soft);
+      --accent: var(--leaf);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(226, 177, 90, 0.22), transparent 55%),
+        radial-gradient(ellipse 70% 45% at 100% 20%, rgba(47, 107, 82, 0.16), transparent 50%),
+        linear-gradient(180deg, #eef5f0 0%, #f3f7f4 40%, #e8f0ea 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .side {
+      border-right: 1px solid var(--line);
+      background: rgba(243, 247, 244, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 20px 14px;
+      position: sticky; top: 0; height: 100vh;
+    }
+    .brand { padding: 4px 10px 18px; }
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      letter-spacing: -.02em;
+      color: var(--leaf-deep);
+    }
+    .brand p { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .nav button {
+      width: 100%; text-align: left; border: 0; background: transparent;
+      color: var(--muted); padding: 10px 12px; border-radius: 12px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .nav button:hover { background: rgba(47, 107, 82, 0.08); color: var(--ink); }
+    .nav button.active { background: rgba(47, 107, 82, 0.14); color: var(--leaf-deep); font-weight: 600; }
+    .badge {
+      font-family: var(--mono); font-size: 11px; background: #fff;
+      border: 1px solid var(--line); padding: 1px 7px; border-radius: 999px; color: var(--ink);
+    }
+    .badge.hot {
+      background: rgba(226, 177, 90, 0.22);
+      border-color: rgba(201, 146, 47, 0.4);
+      color: var(--sun-deep);
+    }
+    .main { padding: 22px 24px 40px; }
+    .topbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+    .topbar h2 {
+      margin: 0;
+      flex: 1;
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      letter-spacing: -.02em;
+      color: var(--leaf-deep);
+    }
+    .btn {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      padding: 8px 12px; border-radius: 999px; cursor: pointer; font-weight: 600;
+    }
+    .btn:hover { background: rgba(47, 107, 82, 0.08); border-color: rgba(47, 107, 82, 0.25); }
+    .btn.primary {
+      background: var(--leaf-deep);
+      color: #f7faf8;
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgba(29, 70, 54, 0.18);
+    }
+    .btn.primary:hover { background: var(--leaf); }
+    .btn.ghost { background: transparent; }
+    .btn.danger { color: var(--danger); border-color: rgba(155, 74, 60, 0.3); }
+    .grid { display: grid; gap: 12px; }
+    .grid.stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 16px; }
+    .card {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+    .stat .label { color: var(--muted); font-size: 12px; font-weight: 600; }
+    .stat .value {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 4px;
+      letter-spacing: -.03em;
+      color: var(--leaf-deep);
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .muted { color: var(--muted); }
+    .tiny { font-size: 12px; }
+    .mono { font-family: var(--mono); font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; }
+    tr:hover td { background: rgba(47, 107, 82, 0.04); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; padding: 2px 8px; font-size: 11px; border: 1px solid var(--line);
+      background: var(--bg3); white-space: nowrap; font-weight: 600; color: var(--ink-soft);
+    }
+    .pill.overdue { background: rgba(155, 74, 60, 0.12); border-color: rgba(155, 74, 60, 0.3); color: var(--danger); }
+    .pill.today { background: rgba(226, 177, 90, 0.22); border-color: rgba(201, 146, 47, 0.35); color: var(--sun-deep); }
+    .pill.done { background: rgba(47, 107, 82, 0.14); border-color: rgba(47, 107, 82, 0.28); color: var(--leaf-deep); }
+    .pill.paused { opacity: .7; }
+    .hint {
+      background: rgba(47, 107, 82, 0.08);
+      border: 1px solid rgba(47, 107, 82, 0.18);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .hint strong { color: var(--leaf-deep); }
+    .template {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.45;
+      max-height: 260px;
+      overflow: auto;
+      color: var(--ink);
+    }
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(12, 24, 20, 0.45); display: none;
+      align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 50; overflow: auto;
+      backdrop-filter: blur(4px);
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      width: min(720px, 100%);
+      background: #f7faf8;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .modal h3 {
+      margin: 0 0 12px;
+      font-family: var(--font-display);
+      color: var(--leaf-deep);
+    }
+    .form { display: grid; gap: 10px; }
+    .form label { display: grid; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+    .form input, .form select, .form textarea {
+      width: 100%;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 9px 11px;
+    }
+    .form textarea { min-height: 120px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .empty { padding: 28px; text-align: center; color: var(--muted); }
+    .toast {
+      position: fixed; right: 16px; bottom: 16px;
+      background: var(--ink);
+      color: #f7faf8;
+      border: 0;
+      padding: 10px 14px;
+      border-radius: 999px;
+      display: none;
+      z-index: 60;
+      max-width: 320px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+    .toast.show { display: block; }
+    .task-card h3 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+      font-family: var(--font-display);
+      color: var(--leaf-deep);
+    }
+    .task-card .actions { margin-top: 12px; }
+    a { color: var(--leaf); }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .side { position: relative; height: auto; }
+      .grid.stats { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <div class="brand">
+        <h1>К дому Outreach</h1>
+        <p>CRM касаний приютов · как Tango</p>
+      </div>
+      <nav class="nav">
+        <button class="active" data-view="today">Сегодня <span class="badge hot" id="badge-today">0</span></button>
+        <button data-view="tasks">Все задачи <span class="badge" id="badge-tasks">0</span></button>
+        <button data-view="journal">Журнал <span class="badge" id="badge-journal">0</span></button>
+        <button data-view="contacts">Контакты <span class="badge" id="badge-contacts">0</span></button>
+        <button data-view="templates">Письма</button>
+        <button data-view="hints">Правила</button>
+        <button data-view="settings">Настройки</button>
+      </nav>
+      <div style="margin-top:18px; padding:0 8px;" class="tiny muted">
+        Данные в этом браузере.<br/>Раз в неделю — экспорт JSON.
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h2 id="view-title">Сегодня</h2>
+        <button class="btn" id="btn-new-task">+ Задача</button>
+        <button class="btn primary" id="btn-new-contact">+ Контакт</button>
+      </div>
+      <div id="view-root"></div>
+    </main>
+  </div>
+
+  <div class="modal-bg" id="modal"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="./seed.js"></script>
+  <script>
+    const STORAGE_KEY = "kdomu-outreach-crm-v1";
+    const STATUS_LABELS = {
+      cold: "cold · ещё не писали",
+      touched: "touched · уже писали",
+      no_reply: "no_reply · писали, тишина",
+      replied: "replied · ответили",
+      meeting: "meeting · визит/созвон",
+      cards: "cards · карточки есть",
+      paused: "paused · пауза",
+      lost: "lost · отказ",
+    };
+    const CADENCE = [
+      { day: 0, type: "msg_first", title: "Сообщение · первое / визит", template: "visit", channel: "any" },
+      { day: 2, type: "msg_fu", title: "Follow-up", template: "followup", channel: "any" },
+      { day: 4, type: "msg_ping", title: "Пинг · другой канал", template: "ping", channel: "any" },
+      { day: 7, type: "visit_ask", title: "Предложить визит ещё раз", template: "visit", channel: "any" },
+      { day: 14, type: "breakup", title: "Закрыть / пауза", template: "followup", channel: "any" },
+      { day: 90, type: "re", title: "Вернуться (+90)", template: "first", channel: "any" },
+    ];
+
+    let state = loadState();
+    let view = "today";
+
+    function uid(prefix) {
+      return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
+    }
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+    function addDays(iso, days) {
+      const d = new Date(iso + "T12:00:00");
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+    function statusLabel(s) {
+      return STATUS_LABELS[s] || s || "—";
+    }
+    function contactById(id) {
+      return state.contacts.find((c) => c.id === id);
+    }
+    function templateById(id) {
+      return state.templates[id] || Object.values(state.templates)[0];
+    }
+    function letterForTask(task) {
+      const c = contactById(task.contactId);
+      const step = CADENCE.find((s) => s.type === task.type) || CADENCE[0];
+      const tpl = templateById(task.templateId || step.template);
+      return {
+        subject: tpl.subject,
+        body: tpl.body,
+        templateName: tpl.name,
+        contact: c,
+      };
+    }
+
+    function defaultTasksFromContacts(contacts) {
+      const focus = "Москва";
+      return contacts
+        .filter((c) => c.city === focus && c.status !== "paused" && c.status !== "lost")
+        .map((c, i) => ({
+          id: uid("task"),
+          contactId: c.id,
+          type: c.status === "cold" ? "msg_first" : "msg_fu",
+          title: c.status === "cold" ? "Сообщение · первое / визит" : "Follow-up",
+          due: addDays(todayISO(), i === 0 ? 0 : Math.min(i, 3)),
+          status: "open",
+          templateId: c.status === "cold" ? "visit" : "followup",
+          note: c.note || "",
+        }));
+    }
+
+    function buildSeedState() {
+      const seed = window.KDOMU_CRM_SEED;
+      const contacts = seed.contacts.map((c) => ({
+        ...c,
+        createdAt: new Date().toISOString(),
+        lastTouchAt: c.status === "no_reply" || c.status === "touched" ? new Date().toISOString() : "",
+        touchLog: c.touchLog || [],
+      }));
+      return {
+        version: seed.version,
+        settings: { ...seed.settings },
+        templates: { ...seed.templates },
+        contacts,
+        tasks: defaultTasksFromContacts(contacts),
+        journal: [],
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      return buildSeedState();
+    }
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render();
+    }
+
+    function openTasks() {
+      return state.tasks.filter((t) => t.status !== "done");
+    }
+    function todayQueue() {
+      const size = Number(state.settings.todayQueueSize) || 4;
+      const today = todayISO();
+      return openTasks()
+        .map((t) => ({ t, c: contactById(t.contactId) }))
+        .filter((x) => x.c && x.c.status !== "paused" && x.c.status !== "lost")
+        .filter((x) => x.c.city === "Москва" || x.c.priority === "A")
+        .sort((a, b) => {
+          const ad = a.t.due || "9999";
+          const bd = b.t.due || "9999";
+          if (ad !== bd) return ad.localeCompare(bd);
+          return (a.c.priority || "Z").localeCompare(b.c.priority || "Z");
+        })
+        .slice(0, size);
+    }
+
+    function duePill(due) {
+      const today = todayISO();
+      if (!due) return '<span class="pill">без даты</span>';
+      if (due < today) return `<span class="pill overdue">просрочено ${due}</span>`;
+      if (due === today) return `<span class="pill today">сегодня</span>`;
+      return `<span class="pill">${due}</span>`;
+    }
+
+    async function copyText(text) {
+      await navigator.clipboard.writeText(text);
+    }
+
+    function logTouch(contact, channel, summary) {
+      const at = new Date().toISOString();
+      contact.lastTouchAt = at;
+      contact.touchLog = contact.touchLog || [];
+      contact.touchLog.unshift({ at, channel, summary });
+      state.journal.unshift({
+        id: uid("j"),
+        at,
+        contactId: contact.id,
+        name: contact.name,
+        shelter: contact.shelter,
+        channel,
+        summary,
+      });
+    }
+
+    function nextCadenceType(currentType) {
+      const idx = CADENCE.findIndex((s) => s.type === currentType);
+      if (idx < 0 || idx >= CADENCE.length - 1) return null;
+      return CADENCE[idx + 1];
+    }
+
+    async function copyAndSent(taskId) {
+      const task = state.tasks.find((t) => t.id === taskId);
+      if (!task) return;
+      const letter = letterForTask(task);
+      const contact = letter.contact;
+      if (!contact) return toast("Контакт не найден");
+      const text = letter.body;
+      try {
+        await copyText(text);
+      } catch (_) {
+        return toast("Не удалось скопировать");
+      }
+      task.status = "done";
+      task.doneAt = new Date().toISOString();
+      if (contact.status === "cold") contact.status = "touched";
+      else if (["touched", "no_reply"].includes(contact.status)) contact.status = "no_reply";
+      logTouch(contact, contact.channel || "message", `Отправлено: ${task.title}`);
+      const next = nextCadenceType(task.type);
+      if (next && !["replied", "meeting", "cards", "lost", "paused"].includes(contact.status)) {
+        const gap = next.day - (CADENCE.find((s) => s.type === task.type)?.day || 0);
+        state.tasks.push({
+          id: uid("task"),
+          contactId: contact.id,
+          type: next.type,
+          title: next.title,
+          due: addDays(todayISO(), Math.max(gap, 1)),
+          status: "open",
+          templateId: next.template,
+          note: "",
+        });
+      }
+      saveState();
+      toast("Скопировано · отмечено отправленным · следующий шаг создан");
+    }
+
+    function markReplied(contactId) {
+      const c = contactById(contactId);
+      if (!c) return;
+      c.status = "replied";
+      logTouch(c, "reply", "Ответили");
+      saveState();
+      toast("Статус: replied");
+    }
+    function markMeeting(contactId) {
+      const c = contactById(contactId);
+      if (!c) return;
+      c.status = "meeting";
+      logTouch(c, "visit", "Визит/созвон договорён");
+      saveState();
+      toast("Статус: meeting");
+    }
+    function markCards(contactId) {
+      const c = contactById(contactId);
+      if (!c) return;
+      c.status = "cards";
+      logTouch(c, "cards", "Карточки получены");
+      saveState();
+      toast("Статус: cards");
+    }
+
+    function openModal(html) {
+      const modal = document.getElementById("modal");
+      modal.innerHTML = `<div class="modal">${html}</div>`;
+      modal.classList.add("open");
+      modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+      };
+    }
+    function closeModal() {
+      const modal = document.getElementById("modal");
+      modal.classList.remove("open");
+      modal.innerHTML = "";
+    }
+
+    function renderTaskCard(task, contact) {
+      const letter = letterForTask(task);
+      return `
+        <article class="card task-card">
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <h3>${contact.name}</h3>
+              <div class="tiny muted">${contact.shelter} · ${contact.city} · ${statusLabel(contact.status)}</div>
+            </div>
+            ${duePill(task.due)}
+          </div>
+          <p style="margin:10px 0 6px"><strong>${task.title}</strong></p>
+          <div class="tiny muted">${contact.email || contact.phone || contact.telegram || contact.link || "—"}</div>
+          <div class="tiny" style="margin-top:8px">Шаблон: ${letter.templateName}</div>
+          <div class="template" style="margin-top:10px">${escapeHtml(letter.body)}</div>
+          <div class="actions row">
+            <button class="btn primary" data-act="copy-sent" data-id="${task.id}">Копировать+отправлено</button>
+            <button class="btn" data-act="copy-only" data-id="${task.id}">Только копировать</button>
+            <button class="btn" data-act="replied" data-cid="${contact.id}">Ответили</button>
+            <button class="btn" data-act="meeting" data-cid="${contact.id}">Визит</button>
+            <button class="btn" data-act="cards" data-cid="${contact.id}">Карточки</button>
+            ${contact.link ? `<a class="btn ghost" href="${contact.link}" target="_blank" rel="noreferrer">Открыть</a>` : ""}
+          </div>
+        </article>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function renderToday() {
+      const queue = todayQueue();
+      const open = openTasks().length;
+      const replied = state.contacts.filter((c) => ["replied", "meeting", "cards"].includes(c.status)).length;
+      const cards = state.contacts.reduce((n, c) => n + (Number(c.cardsCount) || 0), 0);
+      return `
+        <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 1 визит / 5–10 карточек</strong>. Сейчас фокус — Москва.</div>
+        <div class="grid stats">
+          <div class="card stat"><div class="label">В очереди сегодня</div><div class="value">${queue.length}</div></div>
+          <div class="card stat"><div class="label">Открытых задач</div><div class="value">${open}</div></div>
+          <div class="card stat"><div class="label">Живые диалоги</div><div class="value">${replied}</div></div>
+          <div class="card stat"><div class="label">Карточек</div><div class="value">${cards}</div></div>
+        </div>
+        <div class="grid">
+          ${queue.length ? queue.map(({ t, c }) => renderTaskCard(t, c)).join("") : `<div class="card empty">На сегодня очередь пуста. Загляните во «Все задачи» или добавьте контакт.</div>`}
+        </div>`;
+    }
+
+    function renderTasks() {
+      const list = [...state.tasks].sort((a, b) => String(a.due).localeCompare(String(b.due)));
+      return `
+        <div class="card">
+          <table>
+            <thead><tr><th>Дата</th><th>Контакт</th><th>Задача</th><th>Статус</th><th></th></tr></thead>
+            <tbody>
+              ${list.map((t) => {
+                const c = contactById(t.contactId) || { name: "—" };
+                return `<tr>
+                  <td>${duePill(t.due)}</td>
+                  <td>${c.name}<div class="tiny muted">${c.shelter || ""}</div></td>
+                  <td>${t.title}</td>
+                  <td>${t.status === "done" ? '<span class="pill done">done</span>' : '<span class="pill">open</span>'}</td>
+                  <td>${t.status !== "done" ? `<button class="btn" data-act="open-task" data-id="${t.id}">Открыть</button>` : ""}</td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function renderJournal() {
+      if (!state.journal.length) return `<div class="card empty">Журнал пуст — после «Копировать+отправлено» появятся записи.</div>`;
+      return `<div class="card"><table>
+        <thead><tr><th>Когда</th><th>Контакт</th><th>Канал</th><th>Что</th></tr></thead>
+        <tbody>
+          ${state.journal.map((j) => `<tr>
+            <td class="mono">${(j.at || "").replace("T", " ").slice(0, 16)}</td>
+            <td>${j.name}<div class="tiny muted">${j.shelter || ""}</div></td>
+            <td>${j.channel || "—"}</td>
+            <td>${j.summary || ""}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>`;
+    }
+
+    function renderContacts() {
+      const list = [...state.contacts].sort((a, b) => {
+        if (a.city !== b.city) return a.city === "Москва" ? -1 : 1;
+        return (a.priority || "").localeCompare(b.priority || "");
+      });
+      return `<div class="card"><table>
+        <thead><tr><th>Контакт</th><th>Город</th><th>Приоритет</th><th>Статус</th><th>Связь</th><th></th></tr></thead>
+        <tbody>
+          ${list.map((c) => `<tr>
+            <td><strong>${c.name}</strong><div class="tiny muted">${c.shelter} · ${c.role || ""}</div></td>
+            <td>${c.city}</td>
+            <td>${c.priority || "—"}</td>
+            <td><span class="pill ${c.status === "paused" ? "paused" : ""}">${statusLabel(c.status)}</span></td>
+            <td class="tiny">${c.email || c.phone || c.telegram || "—"}</td>
+            <td class="row">
+              <button class="btn" data-act="edit-contact" data-cid="${c.id}">Карточка</button>
+              <button class="btn" data-act="task-for" data-cid="${c.id}">+ Задача</button>
+            </td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>`;
+    }
+
+    function renderTemplates() {
+      return `<div class="grid">${Object.values(state.templates).map((t) => `
+        <article class="card">
+          <div class="row" style="justify-content:space-between">
+            <strong>${t.name}</strong>
+            <button class="btn primary" data-act="copy-tpl" data-tid="${t.id}">Копировать</button>
+          </div>
+          <div class="tiny muted" style="margin:8px 0">${t.subject}</div>
+          <div class="template">${escapeHtml(t.body)}</div>
+        </article>`).join("")}</div>`;
+    }
+
+    function renderHints() {
+      return `<div class="grid">
+        <div class="card hint" style="margin:0"><strong>Как в Tango:</strong> открываете «Сегодня» → копируете письмо → жмёте <strong>Копировать+отправлено</strong> → CRM сама ставит следующий шаг cadence.</div>
+        <div class="card">
+          <h3 style="margin-top:0">Правила пилота «К дому»</h3>
+          <ul>
+            <li>KPI = диалог / визит / карточки, не число сообщений</li>
+            <li>Фокус: Москва. Екатеринбург = paused</li>
+            <li>Cadence: визит-оффер → FU → пинг → ещё визит → пауза → +90</li>
+            <li>Лично: сначала руки волонтёром, потом просьба про 10 анкет</li>
+            <li>Не путать статусы контакта и задачи</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Статусы контакта</h3>
+          <div class="tiny">${Object.entries(STATUS_LABELS).map(([k,v]) => `<div><code>${k}</code> — ${v}</div>`).join("")}</div>
+        </div>
+      </div>`;
+    }
+
+    function renderSettings() {
+      return `<div class="grid">
+        <div class="card form">
+          <label>Размер очереди «Сегодня»
+            <input id="set-queue" type="number" min="1" max="20" value="${state.settings.todayQueueSize || 4}" />
+          </label>
+          <div class="row">
+            <button class="btn primary" id="save-settings">Сохранить</button>
+            <button class="btn" id="export-json">Экспорт JSON</button>
+            <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+              Импорт JSON<input id="import-json" type="file" accept="application/json,.json" hidden />
+            </label>
+            <button class="btn danger" id="reset-seed">Сбросить к базе</button>
+          </div>
+          <p class="tiny muted">Сайт витрины: <a href="../index.html">../index.html</a> · План: <a href="../PLAN.md">../PLAN.md</a></p>
+        </div>
+      </div>`;
+    }
+
+    function render() {
+      const titles = {
+        today: "Сегодня",
+        tasks: "Все задачи",
+        journal: "Журнал",
+        contacts: "Контакты",
+        templates: "Письма",
+        hints: "Правила",
+        settings: "Настройки",
+      };
+      document.getElementById("view-title").textContent = titles[view] || view;
+      document.querySelectorAll(".nav button").forEach((b) => {
+        b.classList.toggle("active", b.dataset.view === view);
+      });
+      document.getElementById("badge-today").textContent = String(todayQueue().length);
+      document.getElementById("badge-tasks").textContent = String(openTasks().length);
+      document.getElementById("badge-journal").textContent = String(state.journal.length);
+      document.getElementById("badge-contacts").textContent = String(state.contacts.length);
+
+      const root = document.getElementById("view-root");
+      const map = {
+        today: renderToday,
+        tasks: renderTasks,
+        journal: renderJournal,
+        contacts: renderContacts,
+        templates: renderTemplates,
+        hints: renderHints,
+        settings: renderSettings,
+      };
+      root.innerHTML = (map[view] || renderToday)();
+    }
+
+    function showContactModal(contact) {
+      openModal(`
+        <h3>${contact.name}</h3>
+        <div class="form">
+          <div class="form-row">
+            <label>Статус
+              <select id="c-status">${Object.keys(STATUS_LABELS).map((s) => `<option value="${s}" ${contact.status===s?"selected":""}>${statusLabel(s)}</option>`).join("")}</select>
+            </label>
+            <label>Приоритет
+              <select id="c-priority">${["A","B","C"].map((p)=>`<option ${contact.priority===p?"selected":""}>${p}</option>`).join("")}</select>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>Боль
+              <select id="c-pain">${["","Мало заявок","Волонтёры","Донаты","Несколько сразу","Пока неясно"].map((p)=>`<option ${contact.pain===p?"selected":""}>${p||"—"}</option>`).join("")}</select>
+            </label>
+            <label>Чем пользуются
+              <input id="c-tools" value="${escapeHtml(contact.tools || "")}" />
+            </label>
+          </div>
+          <label>Заметки<textarea id="c-note">${escapeHtml(contact.note || "")}</textarea></label>
+          <label>Карточек получено<input id="c-cards" type="number" min="0" value="${contact.cardsCount || 0}" /></label>
+          <div class="row">
+            <button class="btn primary" id="c-save">Сохранить</button>
+            <button class="btn ghost" id="c-close">Закрыть</button>
+          </div>
+        </div>`);
+      document.getElementById("c-close").onclick = closeModal;
+      document.getElementById("c-save").onclick = () => {
+        contact.status = document.getElementById("c-status").value;
+        contact.priority = document.getElementById("c-priority").value;
+        contact.pain = document.getElementById("c-pain").value === "—" ? "" : document.getElementById("c-pain").value;
+        contact.tools = document.getElementById("c-tools").value;
+        contact.note = document.getElementById("c-note").value;
+        contact.cardsCount = Number(document.getElementById("c-cards").value) || 0;
+        saveState();
+        closeModal();
+        toast("Контакт сохранён");
+      };
+    }
+
+    function showNewContactModal() {
+      openModal(`
+        <h3>Новый контакт</h3>
+        <div class="form">
+          <div class="form-row">
+            <label>Имя<input id="n-name" required /></label>
+            <label>Приют<input id="n-shelter" /></label>
+          </div>
+          <div class="form-row">
+            <label>Город<select id="n-city"><option>Москва</option><option>Екатеринбург</option><option>Другой</option></select></label>
+            <label>Приоритет<select id="n-priority"><option>A</option><option>B</option><option>C</option></select></label>
+          </div>
+          <div class="form-row">
+            <label>Email<input id="n-email" /></label>
+            <label>Телефон<input id="n-phone" /></label>
+          </div>
+          <label>Ссылка / Telegram<input id="n-link" placeholder="https://t.me/..." /></label>
+          <label>Заметка<textarea id="n-note"></textarea></label>
+          <div class="row">
+            <button class="btn primary" id="n-save">Добавить</button>
+            <button class="btn ghost" id="n-close">Отмена</button>
+          </div>
+        </div>`);
+      document.getElementById("n-close").onclick = closeModal;
+      document.getElementById("n-save").onclick = () => {
+        const name = document.getElementById("n-name").value.trim();
+        if (!name) return toast("Нужно имя");
+        const c = {
+          id: uid("c"),
+          name,
+          shelter: document.getElementById("n-shelter").value.trim() || name,
+          city: document.getElementById("n-city").value,
+          role: "",
+          channel: "any",
+          email: document.getElementById("n-email").value.trim(),
+          phone: document.getElementById("n-phone").value.trim(),
+          telegram: "",
+          link: document.getElementById("n-link").value.trim(),
+          priority: document.getElementById("n-priority").value,
+          status: "cold",
+          pain: "",
+          tools: "",
+          cardsCount: 0,
+          note: document.getElementById("n-note").value.trim(),
+          touchLog: [],
+          createdAt: new Date().toISOString(),
+          lastTouchAt: "",
+        };
+        state.contacts.unshift(c);
+        state.tasks.unshift({
+          id: uid("task"),
+          contactId: c.id,
+          type: "msg_first",
+          title: "Сообщение · первое / визит",
+          due: todayISO(),
+          status: "open",
+          templateId: "visit",
+          note: "",
+        });
+        saveState();
+        closeModal();
+        view = "today";
+        render();
+        toast("Контакт добавлен в очередь");
+      };
+    }
+
+    function showNewTaskModal(contactId) {
+      const contacts = state.contacts;
+      openModal(`
+        <h3>Новая задача</h3>
+        <div class="form">
+          <label>Контакт
+            <select id="t-contact">${contacts.map((c)=>`<option value="${c.id}" ${c.id===contactId?"selected":""}>${c.name} · ${c.city}</option>`).join("")}</select>
+          </label>
+          <label>Тип
+            <select id="t-type">${CADENCE.map((s)=>`<option value="${s.type}">${s.title}</option>`).join("")}</select>
+          </label>
+          <label>Дата<input id="t-due" type="date" value="${todayISO()}" /></label>
+          <div class="row">
+            <button class="btn primary" id="t-save">Создать</button>
+            <button class="btn ghost" id="t-close">Отмена</button>
+          </div>
+        </div>`);
+      document.getElementById("t-close").onclick = closeModal;
+      document.getElementById("t-save").onclick = () => {
+        const type = document.getElementById("t-type").value;
+        const step = CADENCE.find((s) => s.type === type) || CADENCE[0];
+        state.tasks.unshift({
+          id: uid("task"),
+          contactId: document.getElementById("t-contact").value,
+          type: step.type,
+          title: step.title,
+          due: document.getElementById("t-due").value || todayISO(),
+          status: "open",
+          templateId: step.template,
+          note: "",
+        });
+        saveState();
+        closeModal();
+        view = "today";
+        render();
+        toast("Задача создана");
+      };
+    }
+
+    document.querySelector(".nav").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-view]");
+      if (!btn) return;
+      view = btn.dataset.view;
+      render();
+    });
+
+    document.getElementById("btn-new-contact").onclick = showNewContactModal;
+    document.getElementById("btn-new-task").onclick = () => showNewTaskModal();
+
+    document.getElementById("view-root").addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-act]");
+      if (!btn) return;
+      const act = btn.dataset.act;
+      if (act === "copy-sent") return copyAndSent(btn.dataset.id);
+      if (act === "copy-only") {
+        const task = state.tasks.find((t) => t.id === btn.dataset.id);
+        if (!task) return;
+        try {
+          await copyText(letterForTask(task).body);
+          toast("Скопировано");
+        } catch (_) {
+          toast("Не удалось скопировать");
+        }
+      }
+      if (act === "replied") return markReplied(btn.dataset.cid);
+      if (act === "meeting") return markMeeting(btn.dataset.cid);
+      if (act === "cards") return markCards(btn.dataset.cid);
+      if (act === "open-task") {
+        view = "today";
+        render();
+        const el = document.querySelector(`[data-act="copy-sent"][data-id="${btn.dataset.id}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      if (act === "edit-contact") {
+        const c = contactById(btn.dataset.cid);
+        if (c) showContactModal(c);
+      }
+      if (act === "task-for") showNewTaskModal(btn.dataset.cid);
+      if (act === "copy-tpl") {
+        const tpl = templateById(btn.dataset.tid);
+        try {
+          await copyText(tpl.body);
+          toast("Шаблон скопирован");
+        } catch (_) {
+          toast("Не удалось скопировать");
+        }
+      }
+    });
+
+    document.getElementById("view-root").addEventListener("click", (e) => {
+      if (e.target.id === "save-settings") {
+        state.settings.todayQueueSize = Number(document.getElementById("set-queue").value) || 4;
+        saveState();
+        toast("Настройки сохранены");
+      }
+      if (e.target.id === "export-json") {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `kdomu-crm-${todayISO()}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      if (e.target.id === "reset-seed") {
+        if (!confirm("Сбросить CRM к стартовой базе приютов?")) return;
+        state = buildSeedState();
+        saveState();
+        toast("База перезагружена");
+      }
+    });
+
+    document.getElementById("view-root").addEventListener("change", (e) => {
+      if (e.target.id !== "import-json") return;
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          state = JSON.parse(String(reader.result));
+          saveState();
+          toast("Импорт готов");
+        } catch (_) {
+          toast("Битый JSON");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    render();
+  </script>
+</body>
+</html>
