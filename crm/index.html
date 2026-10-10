@@ -256,9 +256,10 @@
   <div class="modal-bg" id="modal"></div>
   <div class="toast" id="toast"></div>
 
-  <script src="./seed.js?v=5"></script>
+  <script src="./seed.js?v=6"></script>
   <script>
-    const STORAGE_KEY = "kdomu-outreach-crm-v5-msk";
+    const STORAGE_KEY = "kdomu-outreach-crm-v6-msk";
+    const SEED_MIN_CONTACTS = 20;
     const STATUS_LABELS = {
       cold: "cold · ещё не писали",
       touched: "touched · уже писали",
@@ -277,16 +278,6 @@
       { day: 14, type: "breakup", title: "Закрыть / пауза", template: "followup", channel: "any" },
       { day: 90, type: "re", title: "Вернуться (+90)", template: "first", channel: "any" },
     ];
-
-    let state = loadState();
-    let view = "today";
-    // Если после загрузки пусто — один раз форсируем seed
-    if ((!state.contacts || state.contacts.length < 5) && window.KDOMU_CRM_SEED?.contacts?.length) {
-      state = buildSeedState();
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (_) {}
-    }
 
     function uid(prefix) {
       return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
@@ -410,34 +401,80 @@
       return fresh;
     }
 
-    function loadState() {
-      const seed = window.KDOMU_CRM_SEED;
-      const seedVersion = seed?.version || 0;
-      // Подтягиваем и со старых ключей, если новый пуст
+    function needsSeedRefresh(parsed, seed) {
+      if (!parsed || !Array.isArray(parsed.contacts)) return true;
+      if (!seed?.contacts?.length) return false;
+      if (parsed.contacts.length < SEED_MIN_CONTACTS) return true;
+      if (Number(parsed.version || 0) < Number(seed.version || 0)) return true;
+      const have = new Set(parsed.contacts.map((c) => c.id));
+      // Если в seed есть контакты, которых нет у пользователя — обновить
+      return seed.contacts.some((c) => !have.has(c.id));
+    }
+
+    function readAnySavedState() {
       const OLD_KEYS = [
         STORAGE_KEY,
+        "kdomu-outreach-crm-v5-msk",
         "kdomu-outreach-crm-v4-msk",
         "kdomu-outreach-crm-v3-msk-full",
         "kdomu-outreach-crm-v2-bryansk",
+        "kdomu-outreach-crm-v1",
       ];
-      try {
-        for (const key of OLD_KEYS) {
+      for (const key of OLD_KEYS) {
+        try {
           const raw = localStorage.getItem(key);
           if (!raw) continue;
           const parsed = JSON.parse(raw);
-          if (!parsed || !Array.isArray(parsed.contacts)) continue;
-          const stale =
-            parsed.contacts.length < 10 ||
-            Number(parsed.version || 0) < seedVersion ||
-            key !== STORAGE_KEY;
-          if (!stale) return parsed;
-          const merged = mergeSeedPreservingProgress(parsed);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-          return merged;
-        }
-      } catch (_) {}
-      return buildSeedState();
+          if (parsed && Array.isArray(parsed.contacts)) return parsed;
+        } catch (_) {}
+      }
+      return null;
     }
+
+    function loadState() {
+      const seed = window.KDOMU_CRM_SEED;
+      const params = new URLSearchParams(location.search);
+      const force = params.get("force") === "1" || params.get("reset") === "1";
+
+      if (force && seed?.contacts?.length) {
+        const existing = readAnySavedState() || { contacts: [], tasks: [], journal: [] };
+        const merged = mergeSeedPreservingProgress(existing);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        return merged;
+      }
+
+      const existing = readAnySavedState();
+      if (!existing) return buildSeedState();
+
+      if (needsSeedRefresh(existing, seed)) {
+        const merged = mergeSeedPreservingProgress(existing);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        return merged;
+      }
+
+      // Уже актуальная база — пишем в актуальный ключ
+      if (Number(existing.version) === Number(seed?.version)) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+      }
+      return existing;
+    }
+
+    function forceRefreshBase() {
+      const seed = window.KDOMU_CRM_SEED;
+      if (!seed?.contacts?.length) {
+        toast("Seed не загрузился — Cmd+Shift+R");
+        return;
+      }
+      state = mergeSeedPreservingProgress(state || readAnySavedState() || { contacts: [], tasks: [], journal: [] });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      view = "contacts";
+      render();
+      toast(`База обновлена: ${state.contacts.length} контактов`);
+    }
+
+    let state = loadState();
+    let view = "today";
+
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       render();
@@ -649,7 +686,12 @@
       const replied = state.contacts.filter((c) => ["replied", "meeting", "cards"].includes(c.status)).length;
       const cards = state.contacts.reduce((n, c) => n + (Number(c.cardsCount) || 0), 0);
       return `
-        <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 10 карточек онлайн</strong>. Визитов нет — пилот Москва + Брянск удалённо.</div>
+        <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 10 карточек онлайн</strong>. Визитов нет — пилот Москва + Брянск удалённо.
+          <div class="row" style="margin-top:10px">
+            <span class="tiny">В базе: <strong>${state.contacts.length}</strong> контактов · seed v${window.KDOMU_CRM_SEED?.version || "?"}</span>
+            ${(state.contacts.length < SEED_MIN_CONTACTS) ? `<button class="btn danger" data-act="force-refresh">Обновить базу сейчас (${window.KDOMU_CRM_SEED?.contacts?.length || 0})</button>` : `<button class="btn" data-act="force-refresh">Обновить базу</button>`}
+          </div>
+        </div>
         <div class="grid stats">
           <div class="card stat"><div class="label">В очереди сегодня</div><div class="value">${queue.length}</div></div>
           <div class="card stat"><div class="label">Открытых задач</div><div class="value">${open}</div></div>
@@ -764,18 +806,19 @@
         <div class="card form">
           <p class="hint" style="margin-top:0"><strong>В базе сейчас:</strong> ${n} контактов · seed v${window.KDOMU_CRM_SEED?.version || "?"} (${seedN} в файле)</p>
           ${err}
+          ${n < SEED_MIN_CONTACTS ? `<p class="tiny" style="color:#b33">Контактов мало — нажмите красную кнопку ниже.</p>` : ""}
           <label>Размер очереди «Сегодня»
             <input id="set-queue" type="number" min="1" max="20" value="${state.settings.todayQueueSize || 6}" />
           </label>
           <div class="row">
+            <button class="btn danger" id="reset-seed">Обновить базу (${seedN})</button>
             <button class="btn primary" id="save-settings">Сохранить</button>
-            <button class="btn danger" id="reset-seed">Сбросить к базе (${seedN})</button>
             <button class="btn" id="export-json">Экспорт JSON</button>
             <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
               Импорт JSON<input id="import-json" type="file" accept="application/json,.json" hidden />
             </label>
           </div>
-          <p class="tiny muted">Если контактов мало — нажмите «Сбросить к базе». Сайт: <a href="../index.html">витрина</a> · <a href="../CONTACTS-MSK.md">CONTACTS-MSK.md</a></p>
+          <p class="tiny muted">Или открой ссылку с принудительным обновлением: <a href="./?force=1">crm/?force=1</a></p>
         </div>
       </div>`;
     }
@@ -987,6 +1030,7 @@
       if (!btn) return;
       const act = btn.dataset.act;
       if (act === "copy-sent") return copyAndSent(btn.dataset.id);
+      if (act === "force-refresh") return forceRefreshBase();
       if (act === "mark-written") {
         markWritten(btn.dataset.cid, "Написала");
         view = "journal";
@@ -1048,12 +1092,7 @@
           toast("Seed не загрузился — обновите страницу (Cmd+Shift+R)");
           return;
         }
-        if (!confirm(`Обновить базу до ${seedN} контактов?\nСтатусы, заметки и журнал сохранятся.`)) return;
-        state = mergeSeedPreservingProgress(state);
-        saveState();
-        view = "contacts";
-        render();
-        toast(`База: ${state.contacts.length} контактов · журнал: ${state.journal.length}`);
+        forceRefreshBase();
       }
     });
 

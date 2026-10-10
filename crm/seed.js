@@ -1,5 +1,5 @@
 window.KDOMU_CRM_SEED = {
-  version: 5,
+  version: 6,
   settings: {
     todayQueueSize: 6,
     cityFocus: "Москва",
