@@ -283,12 +283,34 @@
       return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
     }
     function todayISO() {
-      return new Date().toISOString().slice(0, 10);
+      // Дата «сегодня» по Москве (не UTC)
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
     }
     function addDays(iso, days) {
       const d = new Date(iso + "T12:00:00");
       d.setDate(d.getDate() + days);
       return d.toISOString().slice(0, 10);
+    }
+    function formatMoscow(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return String(iso).replace("T", " ").slice(0, 16);
+      const parts = new Intl.DateTimeFormat("ru-RU", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).formatToParts(d);
+      const get = (t) => parts.find((p) => p.type === t)?.value || "";
+      return `${get("day")}.${get("month")}.${get("year")} ${get("hour")}:${get("minute")}`;
     }
     function toast(msg) {
       const el = document.getElementById("toast");
@@ -801,8 +823,13 @@
     }
 
     function renderTasks() {
-      const open = [...state.tasks]
-        .filter((t) => t.status !== "done")
+      const today = todayISO();
+      const written = writtenContactIds(state);
+      const dueNow = [...state.tasks]
+        .filter((t) => t.status !== "done" && (!t.due || t.due <= today) && !written.has(t.contactId))
+        .sort((a, b) => String(a.due).localeCompare(String(b.due)));
+      const later = [...state.tasks]
+        .filter((t) => t.status !== "done" && t.due && t.due > today)
         .sort((a, b) => String(a.due).localeCompare(String(b.due)));
       const done = [...state.tasks]
         .filter((t) => t.status === "done")
@@ -815,16 +842,24 @@
           <td>${c.name}<div class="tiny muted">${c.shelter || ""}</div></td>
           <td>${t.title}</td>
           <td>${t.status === "done" ? '<span class="pill done">done</span>' : '<span class="pill">open</span>'}</td>
-          <td>${t.status !== "done" ? `<button class="btn" data-act="open-task" data-id="${t.id}">Открыть</button>` : ""}</td>
+          <td>${t.status !== "done" && (!t.due || t.due <= today) ? `<button class="btn" data-act="open-task" data-id="${t.id}">Открыть</button>` : ""}</td>
         </tr>`;
       };
       return `
         <div class="card">
-          <h3 style="margin-top:0">Открытые (${open.length})</h3>
-          <p class="tiny muted">Follow-up с будущей датой здесь виден, но в «Сегодня» не попадает, пока не наступит день.</p>
+          <h3 style="margin-top:0">Сделать сейчас (${dueNow.length})</h3>
+          <p class="tiny muted">Кому уже писали (есть в журнале) сюда не попадают.</p>
           <table>
             <thead><tr><th>Дата</th><th>Контакт</th><th>Задача</th><th>Статус</th><th></th></tr></thead>
-            <tbody>${open.length ? open.map(row).join("") : `<tr><td colspan="5" class="tiny muted">Нет открытых задач</td></tr>`}</tbody>
+            <tbody>${dueNow.length ? dueNow.map(row).join("") : `<tr><td colspan="5" class="tiny muted">Нет задач на сейчас</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Позже · follow-up (${later.length})</h3>
+          <p class="tiny muted">Например Бирюлёво после письма — только напоминание через несколько дней.</p>
+          <table>
+            <thead><tr><th>Дата</th><th>Контакт</th><th>Задача</th><th>Статус</th><th></th></tr></thead>
+            <tbody>${later.length ? later.map(row).join("") : `<tr><td colspan="5" class="tiny muted">Пусто</td></tr>`}</tbody>
           </table>
         </div>
         <div class="card">
