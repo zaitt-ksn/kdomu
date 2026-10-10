@@ -256,9 +256,9 @@
   <div class="modal-bg" id="modal"></div>
   <div class="toast" id="toast"></div>
 
-  <script src="./seed.js?v=4"></script>
+  <script src="./seed.js?v=5"></script>
   <script>
-    const STORAGE_KEY = "kdomu-outreach-crm-v4-msk";
+    const STORAGE_KEY = "kdomu-outreach-crm-v5-msk";
     const STATUS_LABELS = {
       cold: "cold · ещё не писали",
       touched: "touched · уже писали",
@@ -374,26 +374,66 @@
       };
     }
 
+    function mergeSeedPreservingProgress(existing) {
+      const fresh = buildSeedState();
+      const byId = Object.fromEntries((existing.contacts || []).map((c) => [c.id, c]));
+      fresh.contacts = fresh.contacts.map((c) => {
+        const old = byId[c.id];
+        if (!old) return c;
+        return {
+          ...c,
+          status: old.status || c.status,
+          note: old.note || c.note,
+          pain: old.pain || c.pain,
+          tools: old.tools || c.tools,
+          cardsCount: old.cardsCount || c.cardsCount || 0,
+          touchLog: old.touchLog?.length ? old.touchLog : c.touchLog,
+          lastTouchAt: old.lastTouchAt || c.lastTouchAt,
+        };
+      });
+      // Старые контакты, которых нет в seed — оставляем
+      const freshIds = new Set(fresh.contacts.map((c) => c.id));
+      (existing.contacts || []).forEach((c) => {
+        if (!freshIds.has(c.id)) fresh.contacts.push(c);
+      });
+      fresh.journal = Array.isArray(existing.journal) ? existing.journal : [];
+      // Задачи: оставляем открытые по живым контактам + добавляем недостающие A
+      const contactIds = new Set(fresh.contacts.map((c) => c.id));
+      const keptTasks = (existing.tasks || []).filter(
+        (t) => contactIds.has(t.contactId) && t.status !== "done"
+      );
+      const hasOpen = new Set(keptTasks.map((t) => t.contactId));
+      const extra = defaultTasksFromContacts(fresh.contacts).filter(
+        (t) => !hasOpen.has(t.contactId)
+      );
+      fresh.tasks = [...keptTasks, ...extra];
+      return fresh;
+    }
+
     function loadState() {
       const seed = window.KDOMU_CRM_SEED;
       const seedVersion = seed?.version || 0;
+      // Подтягиваем и со старых ключей, если новый пуст
+      const OLD_KEYS = [
+        STORAGE_KEY,
+        "kdomu-outreach-crm-v4-msk",
+        "kdomu-outreach-crm-v3-msk-full",
+        "kdomu-outreach-crm-v2-bryansk",
+      ];
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
+        for (const key of OLD_KEYS) {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
           const parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.contacts)) continue;
           const stale =
-            !parsed ||
-            !Array.isArray(parsed.contacts) ||
             parsed.contacts.length < 10 ||
-            Number(parsed.version || 0) < seedVersion;
+            Number(parsed.version || 0) < seedVersion ||
+            key !== STORAGE_KEY;
           if (!stale) return parsed;
-          // Старая/пустая база — подтягиваем seed, журнал сохраняем если был
-          const fresh = buildSeedState();
-          if (Array.isArray(parsed.journal) && parsed.journal.length) {
-            fresh.journal = parsed.journal;
-          }
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
-          return fresh;
+          const merged = mergeSeedPreservingProgress(parsed);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          return merged;
         }
       } catch (_) {}
       return buildSeedState();
@@ -456,6 +496,40 @@
       return CADENCE[idx + 1];
     }
 
+    function markWritten(contactId, summary) {
+      const contact = contactById(contactId);
+      if (!contact) return toast("Контакт не найден");
+      if (contact.status === "cold") contact.status = "touched";
+      else if (contact.status === "touched") contact.status = "no_reply";
+      else if (!["replied", "meeting", "cards", "lost", "paused"].includes(contact.status)) {
+        contact.status = "no_reply";
+      }
+      logTouch(contact, contact.channel || "email", summary || "Написала");
+      // Закрыть сегодняшнюю открытую задачу по этому контакту и поставить follow-up
+      const open = state.tasks.find(
+        (t) => t.contactId === contactId && t.status !== "done"
+      );
+      if (open) {
+        open.status = "done";
+        open.doneAt = new Date().toISOString();
+        const next = nextCadenceType(open.type) || CADENCE.find((s) => s.type === "msg_fu");
+        if (next) {
+          state.tasks.push({
+            id: uid("task"),
+            contactId: contact.id,
+            type: next.type,
+            title: next.title,
+            due: addDays(todayISO(), 2),
+            status: "open",
+            templateId: next.template,
+            note: "",
+          });
+        }
+      }
+      saveState();
+      toast(`В журнале: ${contact.name}`);
+    }
+
     async function copyAndSent(taskId) {
       const task = state.tasks.find((t) => t.id === taskId);
       if (!task) return;
@@ -463,10 +537,12 @@
       const contact = letter.contact;
       if (!contact) return toast("Контакт не найден");
       const text = letter.body;
+      let copied = false;
       try {
         await copyText(text);
+        copied = true;
       } catch (_) {
-        return toast("Не удалось скопировать");
+        // Копирование могло не сработать — всё равно можно отметить отправку
       }
       task.status = "done";
       task.doneAt = new Date().toISOString();
@@ -488,7 +564,11 @@
         });
       }
       saveState();
-      toast("Скопировано · отмечено отправленным · следующий шаг создан");
+      toast(
+        copied
+          ? "Скопировано · в журнале · следующий шаг создан"
+          : "В журнале · следующий шаг (текст скопировать не удалось — скопируйте вручную)"
+      );
     }
 
     function markReplied(contactId) {
@@ -547,9 +627,9 @@
           <div class="template" style="margin-top:10px">${escapeHtml(letter.body)}</div>
           <div class="actions row">
             <button class="btn primary" data-act="copy-sent" data-id="${task.id}">Копировать+отправлено</button>
+            <button class="btn" data-act="mark-written" data-cid="${contact.id}">Уже написала</button>
             <button class="btn" data-act="copy-only" data-id="${task.id}">Только копировать</button>
             <button class="btn" data-act="replied" data-cid="${contact.id}">Ответили</button>
-            <button class="btn" data-act="meeting" data-cid="${contact.id}">Визит</button>
             <button class="btn" data-act="cards" data-cid="${contact.id}">Карточки</button>
             ${contact.link ? `<a class="btn ghost" href="${contact.link}" target="_blank" rel="noreferrer">Открыть</a>` : ""}
           </div>
@@ -577,7 +657,7 @@
           <div class="card stat"><div class="label">Карточек</div><div class="value">${cards}</div></div>
         </div>
         <div class="grid">
-          ${queue.length ? queue.map(({ t, c }) => renderTaskCard(t, c)).join("") : `<div class="card empty">На сегодня очередь пуста. Загляните во «Все задачи» или добавьте контакт.</div>`}
+          ${queue.length ? queue.map(({ t, c }) => renderTaskCard(t, c)).join("") : `<div class="card empty">На сегодня очередь пуста.${(state.contacts?.length || 0) < 10 ? ` Похоже, база не подгрузилась — откройте <strong>Настройки</strong> → <strong>Сбросить к базе</strong>.` : ` Загляните во «Все задачи» или добавьте контакт.`}</div>`}
         </div>`;
     }
 
@@ -604,7 +684,7 @@
     }
 
     function renderJournal() {
-      if (!state.journal.length) return `<div class="card empty">Журнал пуст — после «Копировать+отправлено» появятся записи.</div>`;
+      if (!state.journal.length) return `<div class="card empty">Журнал пуст.<br><br>Запись появляется только если нажать <strong>«Копировать+отправлено»</strong> или <strong>«Уже написала»</strong> в карточке / контактах.<br>Если писали вне CRM — откройте контакт и нажмите «Уже написала».</div>`;
       return `<div class="card"><table>
         <thead><tr><th>Когда</th><th>Контакт</th><th>Канал</th><th>Что</th></tr></thead>
         <tbody>
@@ -633,6 +713,7 @@
             <td><span class="pill ${c.status === "paused" ? "paused" : ""}">${statusLabel(c.status)}</span></td>
             <td class="tiny">${c.email || c.phone || c.telegram || "—"}</td>
             <td class="row">
+              <button class="btn primary" data-act="mark-written" data-cid="${c.id}">Уже написала</button>
               <button class="btn" data-act="edit-contact" data-cid="${c.id}">Карточка</button>
               <button class="btn" data-act="task-for" data-cid="${c.id}">+ Задача</button>
             </td>
@@ -755,10 +836,23 @@
           <label>Карточек получено<input id="c-cards" type="number" min="0" value="${contact.cardsCount || 0}" /></label>
           <div class="row">
             <button class="btn primary" id="c-save">Сохранить</button>
+            <button class="btn" id="c-written">Уже написала → в журнал</button>
             <button class="btn ghost" id="c-close">Закрыть</button>
           </div>
         </div>`);
       document.getElementById("c-close").onclick = closeModal;
+      document.getElementById("c-written").onclick = () => {
+        contact.status = document.getElementById("c-status").value;
+        contact.priority = document.getElementById("c-priority").value;
+        contact.pain = document.getElementById("c-pain").value === "—" ? "" : document.getElementById("c-pain").value;
+        contact.tools = document.getElementById("c-tools").value;
+        contact.note = document.getElementById("c-note").value;
+        contact.cardsCount = Number(document.getElementById("c-cards").value) || 0;
+        closeModal();
+        markWritten(contact.id, "Написала (вручную из карточки)");
+        view = "journal";
+        render();
+      };
       document.getElementById("c-save").onclick = () => {
         contact.status = document.getElementById("c-status").value;
         contact.priority = document.getElementById("c-priority").value;
@@ -893,6 +987,12 @@
       if (!btn) return;
       const act = btn.dataset.act;
       if (act === "copy-sent") return copyAndSent(btn.dataset.id);
+      if (act === "mark-written") {
+        markWritten(btn.dataset.cid, "Написала");
+        view = "journal";
+        render();
+        return;
+      }
       if (act === "copy-only") {
         const task = state.tasks.find((t) => t.id === btn.dataset.id);
         if (!task) return;
@@ -948,12 +1048,12 @@
           toast("Seed не загрузился — обновите страницу (Cmd+Shift+R)");
           return;
         }
-        if (!confirm(`Сбросить CRM и загрузить ${seedN} контактов из базы?`)) return;
-        state = buildSeedState();
+        if (!confirm(`Обновить базу до ${seedN} контактов?\nСтатусы, заметки и журнал сохранятся.`)) return;
+        state = mergeSeedPreservingProgress(state);
         saveState();
         view = "contacts";
         render();
-        toast(`База: ${state.contacts.length} контактов · ${state.tasks.length} задач`);
+        toast(`База: ${state.contacts.length} контактов · журнал: ${state.journal.length}`);
       }
     });
 

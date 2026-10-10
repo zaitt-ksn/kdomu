@@ -1,5 +1,5 @@
 window.KDOMU_CRM_SEED = {
-  version: 4,
+  version: 5,
   settings: {
     todayQueueSize: 6,
     cityFocus: "Москва",
@@ -174,8 +174,8 @@ https://zaitt-ksn.github.io/kdomu/for-shelters.html
       telegram: "https://t.me/izpriuta_info",
       link: "https://www.izpriuta.ru/",
       priority: "A",
-      status: "cold",
-      note: "Письмо · сильный каталог",
+      status: "no_reply",
+      note: "Ксения написала 10.10.2026 · ждём ответ · follow-up через 2–3 дня",
       touchLog: [],
     },
     {
