@@ -393,12 +393,63 @@
       const keptTasks = (existing.tasks || []).filter(
         (t) => contactIds.has(t.contactId) && t.status !== "done"
       );
-      const hasOpen = new Set(keptTasks.map((t) => t.contactId));
-      const extra = defaultTasksFromContacts(fresh.contacts).filter(
-        (t) => !hasOpen.has(t.contactId)
+      const writtenIds = writtenContactIds(fresh);
+      // Закрыть «напиши сейчас» у тех, кому уже писали
+      keptTasks.forEach((t) => {
+        if (writtenIds.has(t.contactId) && (!t.due || t.due <= todayISO())) {
+          t.status = "done";
+          t.doneAt = new Date().toISOString();
+        }
+      });
+      const openAfter = keptTasks.filter((t) => t.status !== "done");
+      const hasOpen = new Set(openAfter.map((t) => t.contactId));
+      const hasFuture = new Set(
+        openAfter
+          .filter((t) => t.due && t.due > todayISO())
+          .map((t) => t.contactId)
       );
+      const extra = [];
+      fresh.contacts.forEach((c) => {
+        if (c.priority !== "A" || c.status === "paused" || c.status === "lost") return;
+        if (hasOpen.has(c.id) || hasFuture.has(c.id)) return;
+        if (writtenIds.has(c.id)) {
+          // Уже писали — только будущий follow-up, не задача на сегодня
+          if (["replied", "meeting", "cards"].includes(c.status)) return;
+          extra.push({
+            id: uid("task"),
+            contactId: c.id,
+            type: "msg_fu",
+            title: "Follow-up",
+            due: addDays(todayISO(), 3),
+            status: "open",
+            templateId: "followup",
+            note: "follow-up после отправки",
+          });
+          return;
+        }
+        if (hasOpen.has(c.id)) return;
+      });
+      // Новым cold — обычные задачи из seed
+      defaultTasksFromContacts(
+        fresh.contacts.filter((c) => !writtenIds.has(c.id) && !hasOpen.has(c.id))
+      ).forEach((t) => extra.push(t));
       fresh.tasks = [...keptTasks, ...extra];
       return fresh;
+    }
+
+    function writtenContactIds(bundle) {
+      const ids = new Set();
+      (bundle.contacts || []).forEach((c) => {
+        if (["touched", "no_reply", "replied", "meeting", "cards"].includes(c.status)) {
+          ids.add(c.id);
+        }
+      });
+      (bundle.journal || []).forEach((j) => {
+        if (!j.contactId) return;
+        const s = String(j.summary || "");
+        if (/напис|отправ|копир/i.test(s)) ids.add(j.contactId);
+      });
+      return ids;
     }
 
     function needsSeedRefresh(parsed, seed) {
@@ -472,8 +523,41 @@
       toast(`База обновлена: ${state.contacts.length} контактов`);
     }
 
+    function reconcileWrittenTasks() {
+      const written = writtenContactIds(state);
+      const today = todayISO();
+      let changed = false;
+      written.forEach((id) => {
+        state.tasks.forEach((t) => {
+          if (t.contactId !== id || t.status === "done") return;
+          // Задача «напиши сейчас» при уже отправленном письме — закрыть
+          if (!t.due || t.due <= today) {
+            t.status = "done";
+            t.doneAt = new Date().toISOString();
+            changed = true;
+          }
+        });
+        const c = contactById(id);
+        if (!c || ["replied", "meeting", "cards", "lost", "paused"].includes(c.status)) return;
+        const hasFuture = state.tasks.some(
+          (t) => t.contactId === id && t.status !== "done" && t.due && t.due > today
+        );
+        if (!hasFuture) {
+          scheduleFollowUp(c, "msg_first");
+          changed = true;
+        }
+      });
+      if (changed) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (_) {}
+      }
+    }
+
     let state = loadState();
     let view = "today";
+    // На случай старых дублей: если в журнале «написала» — убрать из сегодняшних задач
+    reconcileWrittenTasks();
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -486,12 +570,15 @@
     function todayQueue() {
       const size = Number(state.settings.todayQueueSize) || 6;
       const today = todayISO();
+      const written = writtenContactIds(state);
       return openTasks()
         .map((t) => ({ t, c: contactById(t.contactId) }))
         .filter((x) => x.c && x.c.status !== "paused" && x.c.status !== "lost")
         .filter((x) => x.c.priority === "A" || x.c.city === "Москва" || x.c.city === "Брянск")
-        // Только просроченные и на сегодня — будущий follow-up не висит в «Сегодня»
+        // Только на сегодня/просрочено
         .filter((x) => !x.t.due || x.t.due <= today)
+        // Кому уже писали (журнал/статус) — не показывать в «Сегодня»
+        .filter((x) => !written.has(x.c.id))
         .sort((a, b) => {
           const ad = a.t.due || "9999";
           const bd = b.t.due || "9999";
