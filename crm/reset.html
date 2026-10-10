@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Сброс CRM «К дому»</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
+    button { font: inherit; padding: 0.85rem 1.2rem; border-radius: 10px; border: 0; background: #1d4636; color: #fff; cursor: pointer; }
+    .muted { color: #666; font-size: 0.95rem; }
+    code { background: #f0f0f0; padding: 0.1rem 0.35rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Сброс базы CRM</h1>
+  <p>Нажми кнопку — очистится старый кэш браузера и откроется CRM с <strong>21 контактом</strong> из актуальной базы.</p>
+  <p class="muted">Журнал и статусы «уже писала» постараемся сохранить, если они были.</p>
+  <p><button type="button" id="go">Очистить кэш и открыть CRM</button></p>
+  <p class="muted" id="log"></p>
+  <script src="./seed.js?v=7hard"></script>
+  <script>
+    document.getElementById("go").onclick = () => {
+      const log = document.getElementById("log");
+      const seed = window.KDOMU_CRM_SEED;
+      if (!seed || !seed.contacts || seed.contacts.length < 20) {
+        log.textContent = "Ошибка: seed.js не загрузился. Обнови эту страницу (Cmd+Shift+R) и нажми ещё раз.";
+        return;
+      }
+
+      // Сохраняем прогресс до очистки
+      let journal = [];
+      let statusById = {};
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf("kdomu") === 0) keys.push(k);
+      }
+      keys.forEach((k) => {
+        try {
+          const raw = localStorage.getItem(k);
+          const parsed = JSON.parse(raw || "null");
+          if (!parsed) return;
+          if (Array.isArray(parsed.journal) && parsed.journal.length) journal = parsed.journal;
+          (parsed.contacts || []).forEach((c) => {
+            if (c && c.id) {
+              statusById[c.id] = {
+                status: c.status,
+                note: c.note,
+                touchLog: c.touchLog,
+                lastTouchAt: c.lastTouchAt,
+                cardsCount: c.cardsCount,
+                pain: c.pain,
+                tools: c.tools,
+              };
+            }
+          });
+        } catch (_) {}
+      });
+
+      // Полная очистка всех ключей CRM
+      keys.forEach((k) => localStorage.removeItem(k));
+
+      const STORAGE_KEY = "kdomu-outreach-crm-v7-hard";
+      const contacts = seed.contacts.map((c) => {
+        const old = statusById[c.id] || {};
+        return {
+          ...c,
+          ...old,
+          status: old.status || c.status,
+          note: old.note || c.note,
+          createdAt: new Date().toISOString(),
+          touchLog: old.touchLog || [],
+        };
+      });
+
+      const written = new Set(
+        contacts
+          .filter((c) => ["touched", "no_reply", "replied", "meeting", "cards"].includes(c.status))
+          .map((c) => c.id)
+      );
+      journal.forEach((j) => {
+        if (j.contactId && /напис|отправ|копир/i.test(String(j.summary || ""))) written.add(j.contactId);
+      });
+
+      const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+
+      function addDays(n) {
+        const d = new Date(today + "T12:00:00");
+        d.setDate(d.getDate() + n);
+        return d.toISOString().slice(0, 10);
+      }
+
+      const tasks = [];
+      let i = 0;
+      contacts.forEach((c) => {
+        if (c.priority !== "A" || c.status === "paused" || c.status === "lost") return;
+        if (written.has(c.id)) {
+          if (["replied", "meeting", "cards"].includes(c.status)) return;
+          tasks.push({
+            id: "task_fu_" + c.id,
+            contactId: c.id,
+            type: "msg_fu",
+            title: "Follow-up",
+            due: addDays(3),
+            status: "open",
+            templateId: "followup",
+            note: "follow-up после отправки",
+          });
+          return;
+        }
+        tasks.push({
+          id: "task_" + c.id,
+          contactId: c.id,
+          type: c.status === "cold" ? "msg_first" : "msg_fu",
+          title: c.status === "cold" ? "Сообщение · онлайн-подключение" : "Follow-up",
+          due: i < 6 ? today : addDays(Math.min(i - 5, 5)),
+          status: "open",
+          templateId: c.status === "cold" ? "visit" : "followup",
+          note: c.note || "",
+        });
+        i += 1;
+      });
+
+      const state = {
+        version: seed.version,
+        settings: { ...seed.settings },
+        templates: { ...seed.templates },
+        contacts,
+        tasks,
+        journal,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      log.textContent = "Готово: " + contacts.length + " контактов. Открываю CRM…";
+      location.href = "./index.html?fresh=" + Date.now();
+    };
+  </script>
+</body>
+</html>

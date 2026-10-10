@@ -256,9 +256,9 @@
   <div class="modal-bg" id="modal"></div>
   <div class="toast" id="toast"></div>
 
-  <script src="./seed.js?v=6"></script>
+  <script src="./seed.js?v=7"></script>
   <script>
-    const STORAGE_KEY = "kdomu-outreach-crm-v6-msk";
+    const STORAGE_KEY = "kdomu-outreach-crm-v7-hard";
     const SEED_MIN_CONTACTS = 20;
     const STATUS_LABELS = {
       cold: "cold · ещё не писали",
@@ -487,6 +487,7 @@
     function readAnySavedState() {
       const OLD_KEYS = [
         STORAGE_KEY,
+        "kdomu-outreach-crm-v6-msk",
         "kdomu-outreach-crm-v5-msk",
         "kdomu-outreach-crm-v4-msk",
         "kdomu-outreach-crm-v3-msk-full",
@@ -806,9 +807,12 @@
       const cards = state.contacts.reduce((n, c) => n + (Number(c.cardsCount) || 0), 0);
       return `
         <div class="hint"><strong>KPI недели:</strong> не «написала 10», а <strong>1 диалог / 10 карточек онлайн</strong>. Визитов нет — пилот Москва + Брянск удалённо.
-          <div class="row" style="margin-top:10px">
-            <span class="tiny">В базе: <strong>${state.contacts.length}</strong> контактов · seed v${window.KDOMU_CRM_SEED?.version || "?"}</span>
-            ${(state.contacts.length < SEED_MIN_CONTACTS) ? `<button class="btn danger" data-act="force-refresh">Обновить базу сейчас (${window.KDOMU_CRM_SEED?.contacts?.length || 0})</button>` : `<button class="btn" data-act="force-refresh">Обновить базу</button>`}
+          <div class="row" style="margin-top:10px;align-items:center;flex-wrap:wrap;gap:8px">
+            <span class="tiny">В базе: <strong>${state.contacts.length}</strong> / ${window.KDOMU_CRM_SEED?.contacts?.length || "?"} · seed v${window.KDOMU_CRM_SEED?.version || "?"}</span>
+            ${(state.contacts.length < SEED_MIN_CONTACTS)
+              ? `<a class="btn danger" href="./reset.html">База устарела — сбросить кэш</a>`
+              : `<a class="btn" href="./reset.html">Сбросить кэш базы</a>`}
+            <button class="btn" type="button" data-act="force-refresh">Подтянуть seed</button>
           </div>
         </div>
         <div class="grid stats">
@@ -874,10 +878,10 @@
     function renderJournal() {
       if (!state.journal.length) return `<div class="card empty">Журнал пуст.<br><br>Запись появляется только если нажать <strong>«Копировать+отправлено»</strong> или <strong>«Уже написала»</strong> в карточке / контактах.<br>Если писали вне CRM — откройте контакт и нажмите «Уже написала».</div>`;
       return `<div class="card"><table>
-        <thead><tr><th>Когда</th><th>Контакт</th><th>Канал</th><th>Что</th></tr></thead>
+        <thead><tr><th>Когда (МСК)</th><th>Контакт</th><th>Канал</th><th>Что</th></tr></thead>
         <tbody>
           ${state.journal.map((j) => `<tr>
-            <td class="mono">${(j.at || "").replace("T", " ").slice(0, 16)}</td>
+            <td class="mono">${formatMoscow(j.at)}</td>
             <td>${j.name}<div class="tiny muted">${j.shelter || ""}</div></td>
             <td>${j.channel || "—"}</td>
             <td>${j.summary || ""}</td>
@@ -964,7 +968,7 @@
               Импорт JSON<input id="import-json" type="file" accept="application/json,.json" hidden />
             </label>
           </div>
-          <p class="tiny muted">Или открой ссылку с принудительным обновлением: <a href="./?force=1">crm/?force=1</a></p>
+          <p class="tiny muted">Если база не обновляется — открой <a href="./reset.html"><strong>crm/reset.html</strong></a> (очищает кэш браузера).</p>
         </div>
       </div>`;
     }
