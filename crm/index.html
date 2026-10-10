@@ -256,9 +256,9 @@
   <div class="modal-bg" id="modal"></div>
   <div class="toast" id="toast"></div>
 
-  <script src="./seed.js"></script>
+  <script src="./seed.js?v=4"></script>
   <script>
-    const STORAGE_KEY = "kdomu-outreach-crm-v3-msk-full";
+    const STORAGE_KEY = "kdomu-outreach-crm-v4-msk";
     const STATUS_LABELS = {
       cold: "cold · ещё не писали",
       touched: "touched · уже писали",
@@ -280,6 +280,13 @@
 
     let state = loadState();
     let view = "today";
+    // Если после загрузки пусто — один раз форсируем seed
+    if ((!state.contacts || state.contacts.length < 5) && window.KDOMU_CRM_SEED?.contacts?.length) {
+      state = buildSeedState();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (_) {}
+    }
 
     function uid(prefix) {
       return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
@@ -321,6 +328,7 @@
     }
 
     function defaultTasksFromContacts(contacts) {
+      const queueSize = Number(window.KDOMU_CRM_SEED?.settings?.todayQueueSize) || 6;
       return contacts
         .filter((c) => c.priority === "A" && c.status !== "paused" && c.status !== "lost")
         .map((c, i) => ({
@@ -328,7 +336,8 @@
           contactId: c.id,
           type: c.status === "cold" ? "msg_first" : "msg_fu",
           title: c.status === "cold" ? "Сообщение · онлайн-подключение" : "Follow-up",
-          due: addDays(todayISO(), i === 0 ? 0 : Math.min(i, 4)),
+          // первая пачка — на сегодня, остальным A — на ближайшие дни
+          due: addDays(todayISO(), i < queueSize ? 0 : Math.min(i - queueSize + 1, 5)),
           status: "open",
           templateId: c.status === "cold" ? "visit" : "followup",
           note: c.note || "",
@@ -337,6 +346,18 @@
 
     function buildSeedState() {
       const seed = window.KDOMU_CRM_SEED;
+      if (!seed || !Array.isArray(seed.contacts) || !seed.contacts.length) {
+        console.error("KDOMU_CRM_SEED не загрузился");
+        return {
+          version: 0,
+          settings: { todayQueueSize: 6, cityFocus: "Москва" },
+          templates: {},
+          contacts: [],
+          tasks: [],
+          journal: [],
+          _seedError: true,
+        };
+      }
       const contacts = seed.contacts.map((c) => ({
         ...c,
         createdAt: new Date().toISOString(),
@@ -354,9 +375,26 @@
     }
 
     function loadState() {
+      const seed = window.KDOMU_CRM_SEED;
+      const seedVersion = seed?.version || 0;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const stale =
+            !parsed ||
+            !Array.isArray(parsed.contacts) ||
+            parsed.contacts.length < 10 ||
+            Number(parsed.version || 0) < seedVersion;
+          if (!stale) return parsed;
+          // Старая/пустая база — подтягиваем seed, журнал сохраняем если был
+          const fresh = buildSeedState();
+          if (Array.isArray(parsed.journal) && parsed.journal.length) {
+            fresh.journal = parsed.journal;
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+          return fresh;
+        }
       } catch (_) {}
       return buildSeedState();
     }
@@ -636,20 +674,27 @@
     }
 
     function renderSettings() {
+      const n = state.contacts?.length || 0;
+      const seedN = window.KDOMU_CRM_SEED?.contacts?.length || 0;
+      const err = state._seedError
+        ? `<p class="tiny" style="color:#b33">Seed не загрузился. Обновите страницу с очисткой кэша (Cmd+Shift+R).</p>`
+        : "";
       return `<div class="grid">
         <div class="card form">
+          <p class="hint" style="margin-top:0"><strong>В базе сейчас:</strong> ${n} контактов · seed v${window.KDOMU_CRM_SEED?.version || "?"} (${seedN} в файле)</p>
+          ${err}
           <label>Размер очереди «Сегодня»
-            <input id="set-queue" type="number" min="1" max="20" value="${state.settings.todayQueueSize || 4}" />
+            <input id="set-queue" type="number" min="1" max="20" value="${state.settings.todayQueueSize || 6}" />
           </label>
           <div class="row">
             <button class="btn primary" id="save-settings">Сохранить</button>
+            <button class="btn danger" id="reset-seed">Сбросить к базе (${seedN})</button>
             <button class="btn" id="export-json">Экспорт JSON</button>
             <label class="btn" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
               Импорт JSON<input id="import-json" type="file" accept="application/json,.json" hidden />
             </label>
-            <button class="btn danger" id="reset-seed">Сбросить к базе</button>
           </div>
-          <p class="tiny muted">Сайт витрины: <a href="../index.html">../index.html</a> · План: <a href="../PLAN.md">../PLAN.md</a></p>
+          <p class="tiny muted">Если контактов мало — нажмите «Сбросить к базе». Сайт: <a href="../index.html">витрина</a> · <a href="../CONTACTS-MSK.md">CONTACTS-MSK.md</a></p>
         </div>
       </div>`;
     }
@@ -898,10 +943,17 @@
         URL.revokeObjectURL(a.href);
       }
       if (e.target.id === "reset-seed") {
-        if (!confirm("Сбросить CRM к стартовой базе приютов?")) return;
+        const seedN = window.KDOMU_CRM_SEED?.contacts?.length || 0;
+        if (!seedN) {
+          toast("Seed не загрузился — обновите страницу (Cmd+Shift+R)");
+          return;
+        }
+        if (!confirm(`Сбросить CRM и загрузить ${seedN} контактов из базы?`)) return;
         state = buildSeedState();
         saveState();
-        toast("База перезагружена");
+        view = "contacts";
+        render();
+        toast(`База: ${state.contacts.length} контактов · ${state.tasks.length} задач`);
       }
     });
 
