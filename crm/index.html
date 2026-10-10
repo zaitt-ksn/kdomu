@@ -484,12 +484,14 @@
       return state.tasks.filter((t) => t.status !== "done");
     }
     function todayQueue() {
-      const size = Number(state.settings.todayQueueSize) || 4;
+      const size = Number(state.settings.todayQueueSize) || 6;
       const today = todayISO();
       return openTasks()
         .map((t) => ({ t, c: contactById(t.contactId) }))
         .filter((x) => x.c && x.c.status !== "paused" && x.c.status !== "lost")
         .filter((x) => x.c.priority === "A" || x.c.city === "Москва" || x.c.city === "Брянск")
+        // Только просроченные и на сегодня — будущий follow-up не висит в «Сегодня»
+        .filter((x) => !x.t.due || x.t.due <= today)
         .sort((a, b) => {
           const ad = a.t.due || "9999";
           const bd = b.t.due || "9999";
@@ -533,6 +535,45 @@
       return CADENCE[idx + 1];
     }
 
+    function closeOpenTasksForContact(contactId) {
+      const now = new Date().toISOString();
+      let closedType = null;
+      state.tasks.forEach((t) => {
+        if (t.contactId === contactId && t.status !== "done") {
+          if (!closedType) closedType = t.type;
+          t.status = "done";
+          t.doneAt = now;
+        }
+      });
+      return closedType;
+    }
+
+    function scheduleFollowUp(contact, fromType) {
+      if (["replied", "meeting", "cards", "lost", "paused"].includes(contact.status)) return;
+      // Уже есть будущий follow-up — не плодим дубли
+      const hasFuture = state.tasks.some(
+        (t) =>
+          t.contactId === contact.id &&
+          t.status !== "done" &&
+          (t.due || "") > todayISO()
+      );
+      if (hasFuture) return;
+      const next =
+        nextCadenceType(fromType || "msg_first") ||
+        CADENCE.find((s) => s.type === "msg_fu");
+      if (!next) return;
+      state.tasks.push({
+        id: uid("task"),
+        contactId: contact.id,
+        type: next.type,
+        title: next.title,
+        due: addDays(todayISO(), 3),
+        status: "open",
+        templateId: next.template,
+        note: "авто follow-up после отправки",
+      });
+    }
+
     function markWritten(contactId, summary) {
       const contact = contactById(contactId);
       if (!contact) return toast("Контакт не найден");
@@ -542,29 +583,10 @@
         contact.status = "no_reply";
       }
       logTouch(contact, contact.channel || "email", summary || "Написала");
-      // Закрыть сегодняшнюю открытую задачу по этому контакту и поставить follow-up
-      const open = state.tasks.find(
-        (t) => t.contactId === contactId && t.status !== "done"
-      );
-      if (open) {
-        open.status = "done";
-        open.doneAt = new Date().toISOString();
-        const next = nextCadenceType(open.type) || CADENCE.find((s) => s.type === "msg_fu");
-        if (next) {
-          state.tasks.push({
-            id: uid("task"),
-            contactId: contact.id,
-            type: next.type,
-            title: next.title,
-            due: addDays(todayISO(), 2),
-            status: "open",
-            templateId: next.template,
-            note: "",
-          });
-        }
-      }
+      const closedType = closeOpenTasksForContact(contactId);
+      scheduleFollowUp(contact, closedType);
       saveState();
-      toast(`В журнале: ${contact.name}`);
+      toast(`В журнале: ${contact.name} · задача закрыта · follow-up через 3 дня`);
     }
 
     async function copyAndSent(taskId) {
@@ -579,32 +601,20 @@
         await copyText(text);
         copied = true;
       } catch (_) {
-        // Копирование могло не сработать — всё равно можно отметить отправку
+        // Копирование могло не сработать — всё равно отмечаем отправку
       }
-      task.status = "done";
-      task.doneAt = new Date().toISOString();
       if (contact.status === "cold") contact.status = "touched";
       else if (["touched", "no_reply"].includes(contact.status)) contact.status = "no_reply";
       logTouch(contact, contact.channel || "message", `Отправлено: ${task.title}`);
-      const next = nextCadenceType(task.type);
-      if (next && !["replied", "meeting", "cards", "lost", "paused"].includes(contact.status)) {
-        const gap = next.day - (CADENCE.find((s) => s.type === task.type)?.day || 0);
-        state.tasks.push({
-          id: uid("task"),
-          contactId: contact.id,
-          type: next.type,
-          title: next.title,
-          due: addDays(todayISO(), Math.max(gap, 1)),
-          status: "open",
-          templateId: next.template,
-          note: "",
-        });
-      }
+      const closedType = closeOpenTasksForContact(contact.id) || task.type;
+      task.status = "done";
+      task.doneAt = new Date().toISOString();
+      scheduleFollowUp(contact, closedType);
       saveState();
       toast(
         copied
-          ? "Скопировано · в журнале · следующий шаг создан"
-          : "В журнале · следующий шаг (текст скопировать не удалось — скопируйте вручную)"
+          ? "Скопировано · в журнале · задача убрана · follow-up через 3 дня"
+          : "В журнале · задача убрана (текст скопируйте вручную)"
       );
     }
 
@@ -704,23 +714,37 @@
     }
 
     function renderTasks() {
-      const list = [...state.tasks].sort((a, b) => String(a.due).localeCompare(String(b.due)));
+      const open = [...state.tasks]
+        .filter((t) => t.status !== "done")
+        .sort((a, b) => String(a.due).localeCompare(String(b.due)));
+      const done = [...state.tasks]
+        .filter((t) => t.status === "done")
+        .sort((a, b) => String(b.doneAt || b.due).localeCompare(String(a.doneAt || a.due)))
+        .slice(0, 20);
+      const row = (t) => {
+        const c = contactById(t.contactId) || { name: "—" };
+        return `<tr>
+          <td>${duePill(t.due)}</td>
+          <td>${c.name}<div class="tiny muted">${c.shelter || ""}</div></td>
+          <td>${t.title}</td>
+          <td>${t.status === "done" ? '<span class="pill done">done</span>' : '<span class="pill">open</span>'}</td>
+          <td>${t.status !== "done" ? `<button class="btn" data-act="open-task" data-id="${t.id}">Открыть</button>` : ""}</td>
+        </tr>`;
+      };
       return `
         <div class="card">
+          <h3 style="margin-top:0">Открытые (${open.length})</h3>
+          <p class="tiny muted">Follow-up с будущей датой здесь виден, но в «Сегодня» не попадает, пока не наступит день.</p>
           <table>
             <thead><tr><th>Дата</th><th>Контакт</th><th>Задача</th><th>Статус</th><th></th></tr></thead>
-            <tbody>
-              ${list.map((t) => {
-                const c = contactById(t.contactId) || { name: "—" };
-                return `<tr>
-                  <td>${duePill(t.due)}</td>
-                  <td>${c.name}<div class="tiny muted">${c.shelter || ""}</div></td>
-                  <td>${t.title}</td>
-                  <td>${t.status === "done" ? '<span class="pill done">done</span>' : '<span class="pill">open</span>'}</td>
-                  <td>${t.status !== "done" ? `<button class="btn" data-act="open-task" data-id="${t.id}">Открыть</button>` : ""}</td>
-                </tr>`;
-              }).join("")}
-            </tbody>
+            <tbody>${open.length ? open.map(row).join("") : `<tr><td colspan="5" class="tiny muted">Нет открытых задач</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Недавно закрытые</h3>
+          <table>
+            <thead><tr><th>Дата</th><th>Контакт</th><th>Задача</th><th>Статус</th><th></th></tr></thead>
+            <tbody>${done.length ? done.map(row).join("") : `<tr><td colspan="5" class="tiny muted">Пока пусто</td></tr>`}</tbody>
           </table>
         </div>`;
     }
