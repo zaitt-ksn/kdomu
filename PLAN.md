@@ -6,8 +6,8 @@
 
 **Сайт онлайн:** https://zaitt-ksn.github.io/kdomu/  
 **Для приютов:** https://zaitt-ksn.github.io/kdomu/for-shelters.html  
-**Контакты для писем:** `CONTACTS-MSK-BRYANSK.md`  
-**CRM:** https://zaitt-ksn.github.io/kdomu/crm/ → Настройки → **Сбросить к базе** (подтянет Брянск)  
+**Контакты Москва:** `CONTACTS-MSK.md` · **Звонки:** `CALL-SCRIPT.md` · **Письма:** `letter.txt`  
+**CRM:** https://zaitt-ksn.github.io/kdomu/crm/ → Настройки → **Сбросить к базе** (17 приютов Москвы)  
 
 ---
 
@@ -77,8 +77,8 @@
 
 ## C. Фокус прямо сейчас
 
-Список: `CONTACTS-MSK-BRYANSK.md`  
-Письма: `letter.txt` (блок «удалённо»)  
-CRM: сбросить базу → очередь из приоритета A (Москва + Брянск)
+Список: `CONTACTS-MSK.md`  
+Письма: `letter.txt` · Звонки: `CALL-SCRIPT.md`  
+CRM: сбросить базу → приоритет A по Москве
 
-На этой неделе написать **8 контактам** из файла. Цель: **1 ответ + 10 анкет онлайн**.
+На этой неделе: **7 писем + 5 звонков/WhatsApp**. Цель: **1 диалог + 10 анкет онлайн**.
