@@ -1,114 +1,162 @@
 window.KDOMU_ANIMALS = [
   {
-    id: "misha",
-    name: "Миша",
+    id: "ks-agava",
+    name: "Агава",
     type: "dog",
-    age: "3 года",
+    age: "9 лет",
     city: "Москва",
-    shelter: "Некрасовка",
-    shelterId: "nekrasovka",
-    temperament: "Спокойный, ладит с детьми",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Спокойная, поначалу стеснительная",
     description:
-      "Крупный добрый пёс. Гуляет спокойно, знает базовые команды, ищет дом без суеты.",
+      "Рыжая девочка среднего размера. Сначала может быть пугливой, но быстро раскрывается в любви. Стерилизована. Источник: priut-ks.ru.",
     image:
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=80",
+      "https://static.tildacdn.com/tild6638-3236-4539-b965-333130613665/1409-102.jpg",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-346202342331-agava",
   },
   {
-    id: "luna",
-    name: "Луна",
-    type: "cat",
-    age: "1 год",
-    city: "Москва",
-    shelter: "Некрасовка",
-    shelterId: "nekrasovka",
-    temperament: "Игривая, любопытная",
-    description:
-      "Молодая кошка с мягким характером. Любит играть и сидеть на подоконнике.",
-    image:
-      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "barsik",
-    name: "Барсик",
-    type: "cat",
-    age: "5 лет",
-    city: "Москва",
-    shelter: "ЮАО",
-    shelterId: "uao",
-    temperament: "Независимый, ласковый вечером",
-    description:
-      "Взрослый кот для спокойного дома. Приучен к лотку, стерилизован.",
-    image:
-      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "reks",
-    name: "Рекс",
+    id: "ks-aleksa",
+    name: "Алекса",
     type: "dog",
-    age: "2 года",
+    age: "1,5 года",
     city: "Москва",
-    shelter: "Искра",
-    shelterId: "iskra",
-    temperament: "Энергичный, умный",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Озорная, активная",
     description:
-      "Активный пёс для семьи, которая любит прогулки и тренировки.",
+      "Светлая девочка среднего размера. Озорная малышка, которой нужен дом с движением и вниманием. Стерилизована. Источник: priut-ks.ru.",
     image:
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=900&q=80",
+      "https://static.tildacdn.com/stor6330-3730-4761-a331-633266393636/6f9297cfb72dfc66476ab6852b622fe6.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-659145708802-aleksa",
   },
   {
-    id: "nika",
-    name: "Ника",
-    type: "dog",
-    age: "8 месяцев",
-    city: "Москва",
-    shelter: "Ласковый зверь",
-    shelterId: "laskovyy-zver",
-    temperament: "Дружелюбная, учится быстро",
-    description:
-      "Подросток с мягким взглядом. Идеальна для первого опыта с собакой.",
-    image:
-      "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "musya",
-    name: "Муся",
-    type: "cat",
-    age: "2 года",
-    city: "Москва",
-    shelter: "Искра",
-    shelterId: "iskra",
-    temperament: "Ласковая, тихая",
-    description:
-      "Кошка-обнимашка. Любит тишину, пледы и размеренный день.",
-    image:
-      "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "timon",
-    name: "Тимон",
+    id: "ks-alya",
+    name: "Аля",
     type: "dog",
     age: "4 года",
     city: "Москва",
-    shelter: "ЮАО",
-    shelterId: "uao",
-    temperament: "Сдержанный, верный",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Задорная, нежная, послушная",
     description:
-      "Собака для одного надёжного человека. Спокойно остаётся дома.",
+      "Крупная трёхцветная девочка. Тёплая и послушная, любит контакт. Стерилизована. Источник: priut-ks.ru.",
     image:
-      "https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&w=900&q=80",
+      "https://static.tildacdn.com/stor6231-6266-4633-b834-613165326630/34683710dd73cb718aaa98b8f1856c07.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-728550101572-alya",
   },
   {
-    id: "sofa",
-    name: "Софа",
-    type: "cat",
-    age: "7 месяцев",
+    id: "ks-amal",
+    name: "Амаль",
+    type: "dog",
+    age: "10 лет",
     city: "Москва",
-    shelter: "Ласковый зверь",
-    shelterId: "laskovyy-zver",
-    temperament: "Игривая, социальная",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Спокойный, ищет дом",
     description:
-      "Котёнок-подросток. Легко идёт на контакт, ищет дом с игрушками.",
+      "Средний трёхцветный мальчик. Спокойный пёс с характером «верните меня домой». Кастрирован. Источник: priut-ks.ru.",
     image:
-      "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?auto=format&fit=crop&w=900&q=80",
+      "https://static.tildacdn.com/stor6238-3637-4833-b634-623039356637/63198144.jpg",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-770321856212-amal",
+  },
+  {
+    id: "ks-antei",
+    name: "Антей",
+    type: "dog",
+    age: "8 лет",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Спокойный, надёжный",
+    description:
+      "Чепрачный мальчик среднего размера. Удивительный спокойный пёс для размеренного дома. Кастрирован. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor3962-6566-4930-b366-313332626235/f7c81ca9c950f55301e356bde7c5c674.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-929463120522-antei",
+  },
+  {
+    id: "ks-argos",
+    name: "Аргос",
+    type: "dog",
+    age: "6 лет",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Активный, мечтает о доме",
+    description:
+      "Крупный светлый мальчик. Мечтает стать домашним — готов к семье с прогулками. Кастрирован. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor3561-6133-4464-b764-663332623264/53208250.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-267702538551-argos",
+  },
+  {
+    id: "ks-ares",
+    name: "Арес",
+    type: "dog",
+    age: "8 месяцев",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Активный, юный",
+    description:
+      "Белый мальчик среднего размера — юный принц. Ищет дом, где можно расти и играть. Кастрирован. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor6132-3939-4136-b462-316565626162/82368dc50dc83ef470f43a258c3f790e.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-450690840423-ares",
+  },
+  {
+    id: "ks-ari",
+    name: "Ари",
+    type: "dog",
+    age: "6 лет",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Активная, жизнерадостная",
+    description:
+      "Светлая девочка среднего размера. Веселье, движение, жизнь — для семьи, которая любит гулять. Стерилизована. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor3136-6562-4730-a661-633133616537/54071600.jpg",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-667150027961-ari",
+  },
+  {
+    id: "ks-baggi",
+    name: "Багги",
+    type: "dog",
+    age: "1,5 года",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Активный, смышлёный",
+    description:
+      "Рыжий мальчик среднего размера — вундеркинд приюта. Нужен дом с вниманием и играми. Кастрирован. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor3835-3237-4633-b765-313935636131/16a847e21a28f030b5221f8f0558393d.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-474265893152-baggi",
+  },
+  {
+    id: "ks-bakki",
+    name: "Бакки",
+    type: "dog",
+    age: "6 лет",
+    city: "Москва",
+    shelter: "Красная Сосна",
+    shelterId: "redpine",
+    temperament: "Активный, компактный",
+    description:
+      "Тёмный мальчик среднего размера — маленький и активный «динозаврик». Кастрирован. Источник: priut-ks.ru.",
+    image:
+      "https://static.tildacdn.com/stor3961-6366-4539-b038-623965653136/103e33642bd58204a4cec856bae0732f.webp",
+    sourceUrl:
+      "https://priut-ks.ru/dogs/tproduct/267523223-571059888381-bakki",
   },
 ];

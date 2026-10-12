@@ -1,49 +1,20 @@
 window.KDOMU_SHELTERS = [
   {
-    id: "nekrasovka",
-    name: "Некрасовка",
-    city: "Москва",
-    type: "Муниципальный приют · волонтёры",
-    about:
-      "Московский приют. На витрине «К дому» — животные, которые ждут дом.",
-    link: "https://nekrasovka-priut.ru/",
-    contact: "margaritkaag@gmail.com",
-  },
-  {
-    id: "uao",
-    name: "ЮАО",
+    id: "redpine",
+    name: "Красная Сосна",
     city: "Москва",
     type: "Муниципальный приют",
     about:
-      "Приют Южного административного округа Москвы.",
-    link: "https://uao-priut.ru/",
-    contact: "uao-priut@mail.ru",
-  },
-  {
-    id: "iskra",
-    name: "Искра",
-    city: "Москва",
-    type: "Муниципальный приют · волонтёры",
-    about:
-      "Волонтёры приюта «Искра» помогают собакам и кошкам найти дом.",
-    link: "https://priutiskra.ru/",
-    contact: "+7 915 255-13-23",
-  },
-  {
-    id: "laskovyy-zver",
-    name: "Ласковый зверь",
-    city: "Москва",
-    type: "Частный приют",
-    about:
-      "Частный приют для кошек и собак.",
-    link: "https://lzmsk.ru/",
-    contact: "shelter@lzmsk.ru",
+      "Муниципальный приют для собак «Красная Сосна». На витрине «К дому» — собаки, которых приют согласовал к публикации.",
+    link: "https://priut-ks.ru/",
+    contact: "redpine@bk.ru",
+    vk: "https://vk.com/redpine",
   },
 ];
 
 window.KdomuShared = {
   TG: "zaitt_ksn",
-  STORAGE_ANIMALS: "kdomu_animals_v1",
+  STORAGE_ANIMALS: "kdomu_animals_v2",
   typeLabel: { dog: "Собака", cat: "Кошка" },
 
   loadAnimals() {
