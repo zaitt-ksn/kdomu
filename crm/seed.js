@@ -270,8 +270,8 @@ https://zaitt-ksn.github.io/kdomu/for-shelters.html
       telegram: "https://t.me/priutks",
       link: "https://priut-ks.ru/",
       priority: "A",
-      status: "cold",
-      note: "Письмо / TG @priutks",
+      status: "replied",
+      note: "11.10 ответили: можно самим выбрать 10 из VK (щенки / девочки / мальчики). Собрать карточки → выложить → прислать ссылку.",
       touchLog: [],
     },
     {
